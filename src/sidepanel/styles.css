@@ -403,7 +403,7 @@ button {
   margin-top: 2px;
 }
 
-.footer-github {
+.footer-social-link {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -414,9 +414,14 @@ button {
   border-radius: var(--radius-sm);
 }
 
-.footer-github:hover {
+.footer-social-link:hover {
   color: var(--color-primary);
   background: var(--color-bg-hover);
+}
+
+.footer-social-link svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ============================================
