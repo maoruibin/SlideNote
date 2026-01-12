@@ -419,9 +419,10 @@ button {
   background: var(--color-bg-hover);
 }
 
-.footer-social-link svg {
+.footer-social-icon {
   width: 16px;
   height: 16px;
+  pointer-events: none;
 }
 
 /* ============================================
