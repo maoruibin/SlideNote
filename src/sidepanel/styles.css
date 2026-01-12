@@ -398,21 +398,25 @@ button {
 .footer-social {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-sm);
+  margin-top: 2px;
 }
 
 .footer-github {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-secondary);
-  transition: color var(--duration-fast);
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-primary);
+  transition: all var(--duration-fast);
+  border-radius: var(--radius-sm);
 }
 
 .footer-github:hover {
   color: var(--color-primary);
+  background: var(--color-bg-hover);
 }
 
 /* ============================================
