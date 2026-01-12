@@ -160,10 +160,6 @@ slidenote/
 
 <table align="center">
   <tr>
-    <th align="center">微信打赏</th>
-    <th align="center">支付宝打赏</th>
-  </tr>
-  <tr>
     <td align="center">
       <img src="https://doc.gudong.site/assets/img/wechat-donate.5e615ccb.jpg" width="180" alt="微信打赏"/>
     </td>
