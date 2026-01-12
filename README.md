@@ -1,8 +1,8 @@
-# SlideNote 侧边笔记
-
 <p align="center">
-  <img src="public/icons/icon-128.svg" width="80" alt="SlideNote Logo">
+  <img src="https://gudong.s3.bitiful.net/weimd/1768183653015_image.png" width="600" alt="SlideNote">
 </p>
+
+<h1 align="center">SlideNote 侧边笔记</h1>
 
 <p align="center">
   <strong>Slide notes, always by your side</strong><br>
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote/releases"><img alt="GitHub release" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 
@@ -26,38 +26,25 @@
 - **💾 自动保存** — 停止输入 1 秒后自动保存
 - **🔄 跨设备同步** — 基于 Chrome Storage API，自动云端同步
 - **🔍 搜索过滤** — 实时搜索标题和内容
-- **⚡️ 极致轻量** — 无框架依赖，打包仅 15KB
+- **📋 笔记排序** — 右键菜单，自由调整笔记顺序
+- **⚡️ 极致轻量** — 无框架依赖，打包仅 20KB
 
 ---
 
 ## 🎯 适用场景
 
-```
-┌─────────────────────────────────┐
-│  🔍 搜索...                [+]  │
-│                                 │
-│  ● 常用账号                      │
-│  ○ 云配置                        │
-│  ○ API Keys                     │
-│  ○ 服务器地址                    │
-│                                 │
-│  ─────────────────────          │
-│  由咕咚同学开发                  │
-│  [GitHub]   Slide notes, ...    │
-└─────────────────────────────────┘
-```
-
 | 场景 | 说明 |
 |------|------|
-| 多设备工作者 | 公司电脑存密码，回家电脑能用 |
+| 多设备工作者 | 公司电脑记录，回家电脑继续用 |
 | 技术人员 | 存储 API Key、服务器地址、配置信息 |
 | 运营/自媒体 | 管理多账号密码、文案模板、素材链接 |
+| 临时记录 | 快速记下灵感、待办事项、剪贴板内容 |
 
 ---
 
 ## 📦 安装
 
-### 方式一：从源码安装（开发者）
+### 方式一：从源码安装
 
 ```bash
 # 克隆仓库
@@ -87,9 +74,10 @@ npm run build
 
 1. 点击 Chrome 工具栏的 SlideNote 图标
 2. 侧边栏展开，即可开始使用
-3. 点击 `+` 按钮创建新笔记
+3. 点击「新建笔记」创建第一条笔记
 4. 点击笔记项切换，开始编辑
-5. 停止输入 1 秒后自动保存
+5. 右键点击笔记可排序或删除
+6. 停止输入 1 秒后自动保存
 
 ---
 
@@ -117,10 +105,10 @@ CSS Variables      →  设计系统
 ```
 slidenote/
 ├── src/sidepanel/
-│   ├── core/           # 数据层（Store, EventBus）
+│   ├── core/           # 数据层（Store, EventBus, SyncManager）
 │   ├── components/     # UI 组件
 │   └── utils/          # 工具函数
-├── docs/               # 项目文档
+├── docs/               # 设计文档
 └── public/icons/       # 图标资源
 ```
 
@@ -144,24 +132,24 @@ slidenote/
 - [x] 自动保存
 - [x] 跨设备同步
 - [x] 搜索过滤
-- [x] 删除确认
-- [x] 笔记排序（置顶、上移、下移）
+- [x] 笔记排序（右键菜单）
+- [x] UI 优化（自适应宽度、移除聚焦边框）
 
 ### v0.0.2（计划中）
-- [ ] 归档功能（解决 100KB 限制）
+- [ ] 笔记分组/标签
 - [ ] 数据导出（JSON/Markdown）
-- [ ] 容量监控警告
+- [ ] 快捷键支持
 
 ---
 
 ## 📮 关注作者
 
 <p align="center">
-  <img src="https://blog.gudong.site/assets/profile/gongzhonghao.jpg" width="200" alt="公众号二维码">
+  扫码关注公众号，获取开发日常和产品最新动态
 </p>
 
 <p align="center">
-  扫码关注公众号，获取开发日常和产品最新动态
+  <img src="https://blog.gudong.site/assets/profile/gongzhonghao.jpg" width="180" alt="公众号二维码">
 </p>
 
 ---
@@ -182,10 +170,4 @@ slidenote/
 
 ---
 
-## ⭐ Star History
-
-如果这个项目对你有帮助，请给个 Star 支持一下！
-
-<a href="https://github.com/maoruibin/SlideNote">
-  <img src="https://api.star-history.com/svg?repos=maoruibin/SlideNote&type=Date" alt="Star History Chart">
-</a>
+如果这个项目对你有帮助，请给个 ⭐ Star 支持一下！

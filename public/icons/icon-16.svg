@@ -1,4 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
-  <rect width="16" height="16" rx="3" fill="#0066CC"/>
-  <path d="M4 4h8v1H4V4zm0 3h8v1H4V7zm0 3h5v1H4v-1z" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2D3748"/>
+      <stop offset="100%" style="stop-color:#1A202C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#gradient)"/>
+
+  <!-- Left sidebar panel - bold shape -->
+  <rect x="28" y="28" width="24" height="72" rx="6" fill="#E2E8F0"/>
+
+  <!-- Main note area -->
+  <rect x="58" y="28" width="46" height="72" rx="6" fill="#FFFFFF"/>
+
+  <!-- Note content lines - thicker -->
+  <rect x="66" y="44" width="30" height="6" rx="3" fill="#CBD5E0"/>
+  <rect x="66" y="56" width="30" height="6" rx="3" fill="#CBD5E0"/>
+  <rect x="66" y="68" width="20" height="6" rx="3" fill="#CBD5E0"/>
+
+  <!-- Highlight dot - accent -->
+  <circle cx="40" cy="44" r="4" fill="#1A202C"/>
 </svg>
