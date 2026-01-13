@@ -17,8 +17,11 @@ npm install
 # Development server (for HTML prototype debugging)
 npm run dev
 
-# Build for production
-npm run build
+# Build for development (shows "SlideNote Dev" in browser)
+npm run build:dev
+
+# Build for production (shows "SlideNote" in browser)
+npm run build:prod
 
 # Type checking (JSDoc + TypeScript)
 npm run type-check
@@ -26,6 +29,13 @@ npm run type-check
 # Linting
 npm run lint
 ```
+
+### Build Commands Explained
+
+| Command | Display Name | Use Case |
+|---------|--------------|----------|
+| `npm run build:dev` | SlideNote Dev | Development/testing - can coexist with production version |
+| `npm run build:prod` | SlideNote | Production release - for Chrome Web Store and distribution |
 
 ## Architecture Overview
 

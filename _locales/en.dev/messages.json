@@ -1,14 +1,14 @@
 {
   "appName": {
-    "message": "SlideNote",
+    "message": "SlideNote Dev",
     "description": "App name"
   },
   "appDesc": {
-    "message": "Slide notes, always by your side",
+    "message": "Slide notes, always by your side - Dev Build",
     "description": "App description"
   },
   "extensionName": {
-    "message": "Open SlideNote",
+    "message": "Open SlideNote Dev",
     "description": "Extension name"
   },
   "newNote": {
@@ -34,10 +34,6 @@
   "unnamedNote": {
     "message": "Untitled Note",
     "description": "Unnamed note title"
-  },
-  "enterNoteTitle": {
-    "message": "Enter note title...",
-    "description": "Title input placeholder when creating new note"
   },
   "startTyping": {
     "message": "Start typing...",

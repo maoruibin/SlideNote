@@ -16,7 +16,7 @@
 <p align="center">
   <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
-  <a href="https://chromewebstore.google.com/detail/slidenote/"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-Ready-green"></a>
+  <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-Online-green"></a>
 </p>
 
 ---
@@ -45,7 +45,26 @@
 
 ## 📦 Installation
 
-### Option 1: Install from Source
+### Option 1: Chrome Web Store (Recommended)
+
+<a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom">
+  <img src="https://storage.googleapis.com/web-dev-uploads/image/WbDnF6242M_4vTb4X3r3zgA7j10/WbDnF6242M_4vTb4X3r3zgA7j10_1714145428342.png" alt="Install from Chrome Web Store" width="200">
+</a>
+
+[Click here to install from Chrome Web Store](https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom)
+
+### Option 2: Download Local Package
+
+Download the latest release from [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) and install manually:
+
+1. Download and unzip the package
+2. Open Chrome browser
+3. Go to `chrome://extensions/`
+4. Enable "Developer mode" in the top right
+5. Click "Load unpacked"
+6. Select the unzipped folder
+
+### Option 3: Build from Source
 
 ```bash
 # Clone the repository
@@ -55,8 +74,8 @@ cd SlideNote
 # Install dependencies
 npm install
 
-# Build
-npm run build
+# Build for production
+npm run build:prod
 ```
 
 1. Open Chrome browser
@@ -64,10 +83,6 @@ npm run build
 3. Enable "Developer mode" in the top right
 4. Click "Load unpacked"
 5. Select the `dist` folder in the project directory
-
-### Option 2: Chrome Web Store
-
-Search for "SlideNote" and install with one click.
 
 ---
 

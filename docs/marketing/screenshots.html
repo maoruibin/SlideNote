@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlideNote Screenshots</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f2f5;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .screenshot {
+      width: 1280px;
+      height: 800px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+    }
+
+    /* 中文版截图 */
+    .screenshot.zh {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    /* 英文版截图 */
+    .screenshot.en {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    }
+
+    /* 装饰元素 */
+    .decoration {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+
+    .decoration-1 {
+      width: 600px;
+      height: 600px;
+      background: #fff;
+      top: -200px;
+      right: -200px;
+    }
+
+    .decoration-2 {
+      width: 400px;
+      height: 400px;
+      background: #fff;
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .decoration-3 {
+      width: 200px;
+      height: 200px;
+      background: #f59e0b;
+      top: 100px;
+      left: 100px;
+      opacity: 0.08;
+    }
+
+    /* 内容容器 */
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+    }
+
+    /* 左侧内容 */
+    .left-section {
+      flex: 1;
+      padding: 80px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      box-shadow: 0 10px 40px rgba(245, 158, 11, 0.4);
+    }
+
+    .logo svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .title {
+      font-size: 56px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    .title span {
+      color: #f59e0b;
+    }
+
+    .subtitle {
+      font-size: 24px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+
+    /* 特性列表 */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #f59e0b;
+    }
+
+    /* 右侧浏览器窗口 */
+    .right-section {
+      flex: 1;
+      padding: 60px 80px 60px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .browser-window {
+      width: 500px;
+      background: #1e1e1e;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    }
+
+    .browser-header {
+      background: #2d2d2d;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .browser-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .browser-dot.red { background: #ff5f57; }
+    .browser-dot.yellow { background: #febc2e; }
+    .browser-dot.green { background: #28c840; }
+
+    .browser-content {
+      height: 420px;
+      background: #fff;
+      display: flex;
+    }
+
+    /* 模拟侧边栏界面 */
+    .sidebar {
+      width: 140px;
+      background: #f5f5f5;
+      border-right: 1px solid #e0e0e0;
+      padding: 16px;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .sidebar-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 6px;
+    }
+
+    .sidebar-plus {
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: bold;
+    }
+
+    .note-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .note-item.active {
+      background: #e0f2fe;
+      border-left: 3px solid #0284c7;
+    }
+
+    .note-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-preview {
+      font-size: 9px;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .editor {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .editor-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .editor-content {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .editor-line {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .editor-line:nth-child(1) { width: 80%; }
+    .editor-line:nth-child(2) { width: 100%; }
+    .editor-line:nth-child(3) { width: 90%; }
+    .editor-line:nth-child(4) { width: 70%; }
+
+    /* 同步指示器 */
+    .sync-badge {
+      position: absolute;
+      bottom: 60px;
+      left: 60px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+    }
+
+    .sync-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sync-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* 版本标签 */
+    .version-label {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* 标签 */
+    .section-label {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 中文版截图 -->
+  <div class="screenshot zh">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    <div class="decoration decoration-3"></div>
+
+    <div class="content">
+      <div class="left-section">
+        <div class="logo">
+          <svg viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/>
+            <rect x="14" y="14" width="8" height="20" rx="3" fill="#1a1a2e"/>
+            <rect x="26" y="14" width="14" height="20" rx="3" fill="#e5e7eb"/>
+            <rect x="30" y="18" width="8" height="2" rx="1" fill="#9ca3af"/>
+            <rect x="30" y="22" width="6" height="2" rx="1" fill="#9ca3af"/>
+          </svg>
+        </div>
+
+        <h1 class="title">SlideNote<br><span>侧边笔记</span></h1>
+        <p class="subtitle">侧边笔记，常伴左右</p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor"/>
+                <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>浏览器侧边栏，随时可用</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor"/>
+                <polyline points="17 21 17 13 7 13 7 21" stroke="currentColor"/>
+                <polyline points="7 3 7 8 15 8" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>跨设备自动同步</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke="currentColor"/>
+                <path d="M12 6v6l4 2" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>1秒自动保存</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="browser-window">
+          <div class="browser-header">
+            <div class="browser-dot red"></div>
+            <div class="browser-dot yellow"></div>
+            <div class="browser-dot green"></div>
+          </div>
+          <div class="browser-content">
+            <div class="sidebar">
+              <div class="sidebar-header">
+                <div class="sidebar-icon"></div>
+                <div class="sidebar-plus">+</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">API 文档</div>
+                <div class="note-preview">接口地址记录...</div>
+              </div>
+              <div class="note-item active">
+                <div class="note-title">购物清单</div>
+                <div class="note-preview">牛奶 鸡蛋 面包...</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">项目笔记</div>
+                <div class="note-preview">待办事项整理...</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">会议记录</div>
+                <div class="note-preview">下周计划讨论...</div>
+              </div>
+            </div>
+            <div class="editor">
+              <div class="editor-title">购物清单</div>
+              <div class="editor-content">
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sync-badge">
+      <div class="sync-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sync-text">Chrome 云同步</div>
+    </div>
+
+    <div class="version-label">v0.0.1</div>
+    <div class="section-label">简体中文</div>
+  </div>
+
+  <!-- 英文版截图 -->
+  <div class="screenshot en">
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+    <div class="decoration decoration-3"></div>
+
+    <div class="content">
+      <div class="left-section">
+        <div class="logo">
+          <svg viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/>
+            <rect x="14" y="14" width="8" height="20" rx="3" fill="#1a1a2e"/>
+            <rect x="26" y="14" width="14" height="20" rx="3" fill="#e5e7eb"/>
+            <rect x="30" y="18" width="8" height="2" rx="1" fill="#9ca3af"/>
+            <rect x="30" y="22" width="6" height="2" rx="1" fill="#9ca3af"/>
+          </svg>
+        </div>
+
+        <h1 class="title">SlideNote<br><span>Always There</span></h1>
+        <p class="subtitle">Quick notes in your browser sidebar</p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor"/>
+                <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>Browser sidebar, always accessible</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" stroke="currentColor"/>
+                <polyline points="17 21 17 13 7 13 7 21" stroke="currentColor"/>
+                <polyline points="7 3 7 8 15 8" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>Auto-sync across devices</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke="currentColor"/>
+                <path d="M12 6v6l4 2" stroke="currentColor"/>
+              </svg>
+            </div>
+            <span>Auto-save in 1 second</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="browser-window">
+          <div class="browser-header">
+            <div class="browser-dot red"></div>
+            <div class="browser-dot yellow"></div>
+            <div class="browser-dot green"></div>
+          </div>
+          <div class="browser-content">
+            <div class="sidebar">
+              <div class="sidebar-header">
+                <div class="sidebar-icon"></div>
+                <div class="sidebar-plus">+</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">API Docs</div>
+                <div class="note-preview">Endpoint notes...</div>
+              </div>
+              <div class="note-item active">
+                <div class="note-title">Shopping List</div>
+                <div class="note-preview">Milk Eggs Bread...</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">Project Notes</div>
+                <div class="note-preview">Todo list items...</div>
+              </div>
+              <div class="note-item">
+                <div class="note-title">Meeting Notes</div>
+                <div class="note-preview">Weekly plan...</div>
+              </div>
+            </div>
+            <div class="editor">
+              <div class="editor-title">Shopping List</div>
+              <div class="editor-content">
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+                <div class="editor-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sync-badge">
+      <div class="sync-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sync-text">Chrome Cloud Sync</div>
+    </div>
+
+    <div class="version-label">v0.0.1</div>
+    <div class="section-label">English</div>
+  </div>
+
+</body>
+</html>

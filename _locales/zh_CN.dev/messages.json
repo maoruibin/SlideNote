@@ -1,14 +1,14 @@
 {
   "appName": {
-    "message": "SlideNote 侧边笔记",
+    "message": "SlideNote Dev (开发版)",
     "description": "应用名称"
   },
   "appDesc": {
-    "message": "侧边笔记，常伴左右",
+    "message": "侧边笔记，常伴左右 - 开发版",
     "description": "应用描述"
   },
   "extensionName": {
-    "message": "打开 SlideNote",
+    "message": "打开 SlideNote Dev",
     "description": "扩展名称"
   },
   "newNote": {
@@ -34,10 +34,6 @@
   "unnamedNote": {
     "message": "未命名笔记",
     "description": "未命名笔记标题"
-  },
-  "enterNoteTitle": {
-    "message": "输入笔记标题...",
-    "description": "标题输入框占位符（新建时）"
   },
   "startTyping": {
     "message": "开始输入...",

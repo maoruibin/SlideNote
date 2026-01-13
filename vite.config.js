@@ -5,17 +5,13 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    copyPublicDir: false, // 不复制 public 目录，由构建脚本单独处理图标
     rollupOptions: {
       input: resolve(__dirname, 'src/sidepanel/index.html'),
       output: {
-        entryFileNames: '[name].js',
+        entryFileNames: 'index.js',
         chunkFileNames: '[name].js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.includes('icon')) {
-            return 'icons/[name].[ext]';
-          }
-          return '[name].[ext]';
-        },
+        assetFileNames: '[name].[ext]',
       },
     },
   },

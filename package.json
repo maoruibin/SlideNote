@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prepare-dist.mjs",
+    "build:dev": "vite build && node scripts/prepare-dist.mjs dev",
+    "build:prod": "vite build && node scripts/prepare-dist.mjs prod",
     "preview": "vite preview",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.254",
+    "sharp": "^0.34.5",
     "typescript": "^5.3.3",
     "vite": "^5.0.11"
-  },
-  "dependencies": {}
+  }
 }

@@ -133,6 +133,20 @@ button {
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
+  transition: width var(--duration-base) var(--ease-out);
+  position: relative;
+}
+
+/* 侧边栏折叠状态 */
+.note-list-section.collapsed {
+  width: 40px;
+}
+
+/* 折叠时隐藏的内容 */
+.note-list-section.collapsed .toolbar,
+.note-list-section.collapsed .note-list,
+.note-list-section.collapsed .note-list-footer {
+  display: none;
 }
 
 /* ============================================
@@ -235,6 +249,7 @@ button {
   color: var(--color-text-tertiary);
   border-radius: var(--radius-sm);
   flex-shrink: 0;
+  margin-right: 4px;
   transition: all var(--duration-fast);
 }
 
@@ -514,6 +529,14 @@ button {
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-sm);
   margin-right: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.note-title-input:focus {
+  border-bottom-color: var(--color-primary);
+  background-color: var(--color-bg-hover);
 }
 
 .note-title-input::placeholder {
@@ -751,4 +774,106 @@ button {
   height: 1px;
   background: var(--color-border);
   margin: 4px 0;
+}
+
+/* ============================================
+   侧边栏折叠/展开按钮
+   设计：分隔线上的微型控制器
+   ============================================ */
+
+/* 收起按钮 - 在右边缘中央 */
+.sidebar-collapse-btn {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  border: 1px solid #bbb;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 10;
+  padding: 0;
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-collapse-btn:hover {
+  background: #f0f7ff;
+  border-color: var(--color-primary);
+  width: 16px;
+  box-shadow: 1px 0 6px rgba(0, 102, 204, 0.15);
+}
+
+.sidebar-collapse-btn svg {
+  width: 9px;
+  height: 9px;
+  color: #666;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.sidebar-collapse-btn:hover svg {
+  color: var(--color-primary);
+}
+
+/* 折叠状态下的展开按钮 - 居中圆形 */
+.note-list-section.collapsed .sidebar-expand-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  border: 1px solid #bbb;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 10;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.note-list-section.collapsed .sidebar-expand-btn:hover {
+  background: #f0f7ff;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.note-list-section.collapsed .sidebar-expand-btn svg {
+  width: 15px;
+  height: 15px;
+  color: #555;
+}
+
+.note-list-section.collapsed .sidebar-expand-btn:hover svg {
+  color: var(--color-primary);
+}
+
+/* 展开按钮的 tooltip */
+.note-list-section.collapsed .sidebar-expand-btn:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  z-index: 100;
 }

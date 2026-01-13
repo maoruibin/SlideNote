@@ -1,6 +1,5 @@
 /**
  * ConfirmDialog - 确认弹窗组件
- * 带倒计时防误操作
  *
  * @example
  * const dialog = new ConfirmDialog({
@@ -16,8 +15,6 @@ import { t } from '../utils/i18n.js';
 export class ConfirmDialog {
   constructor(props = {}) {
     this.props = props;
-    this.countdown = 3;
-    this.timer = null;
     this.el = null;
     this._confirmBtn = null;
   }
@@ -68,8 +65,11 @@ export class ConfirmDialog {
 
     const confirmBtn = document.createElement('button');
     confirmBtn.className = 'dialog-btn dialog-btn-confirm';
-    confirmBtn.textContent = `${t('confirm')} (${this.countdown})`;
-    confirmBtn.disabled = true;
+    confirmBtn.textContent = t('confirm');
+    confirmBtn.onclick = () => {
+      this.props.onConfirm?.();
+      this.close();
+    };
 
     buttons.append(cancelBtn, confirmBtn);
     dialog.append(icon, title, message, buttons);
@@ -79,37 +79,12 @@ export class ConfirmDialog {
     this.el = overlay;
 
     document.body.appendChild(overlay);
-    this._startCountdown();
-  }
-
-  /**
-   * 开始倒计时
-   * @private
-   */
-  _startCountdown() {
-    let count = this.countdown;
-
-    this.timer = setInterval(() => {
-      count--;
-      if (count <= 0) {
-        clearInterval(this.timer);
-        this._confirmBtn.disabled = false;
-        this._confirmBtn.textContent = t('confirm');
-        this._confirmBtn.onclick = () => {
-          this.props.onConfirm?.();
-          this.close();
-        };
-      } else {
-        this._confirmBtn.textContent = `${t('confirm')} (${count})`;
-      }
-    }, 1000);
   }
 
   /**
    * 关闭弹窗
    */
   close() {
-    if (this.timer) clearInterval(this.timer);
     if (this.el) {
       this.el.remove();
       this.el = null;

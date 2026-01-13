@@ -15,6 +15,7 @@ export class NoteEditor {
     this._saveStatus = null;
     this._saveTimer = null;
     this._pendingChanges = null;  // 跟踪未保存的变更
+    this._isNewNote = false;      // 标记是否为新建笔记
     this._cleanup = [];
     this._setupListeners();
   }
@@ -38,6 +39,13 @@ export class NoteEditor {
     titleInput.placeholder = t('unnamedNote');
     titleInput.oninput = (e) => {
       this._saveDebounced(this.state.note.id, { title: e.target.value });
+    };
+    // Tab 键支持：从标题跳到内容区
+    titleInput.onkeydown = (e) => {
+      if (e.key === 'Tab' && !e.shiftKey) {
+        e.preventDefault();
+        this._textarea?.focus();
+      }
     };
 
     const meta = document.createElement('div');
@@ -64,6 +72,13 @@ export class NoteEditor {
     textarea.placeholder = t('startTyping');
     textarea.oninput = (e) => {
       this._saveDebounced(this.state.note.id, { content: e.target.value });
+    };
+    // Tab 键支持：从内容区跳回标题
+    textarea.onkeydown = (e) => {
+      if (e.key === 'Tab' && e.shiftKey) {
+        e.preventDefault();
+        this._titleInput?.focus();
+      }
     };
 
     editor.appendChild(textarea);
@@ -107,17 +122,25 @@ export class NoteEditor {
    */
   _setupListeners() {
     // 监听笔记选择 - 切换前先保存未提交的变更
-    const unsubscribeSelect = this.props.bus?.on('note:select', async (id) => {
+    const unsubscribeSelect = this.props.bus?.on('note:select', async (id, options = {}) => {
       // 如果是当前笔记，跳过
       if (this.state.note?.id === id) return;
 
       // 先保存未提交的变更
       await this._savePendingChanges();
 
+      // 保存是否为新笔记的标记
+      this._isNewNote = options.isNew || false;
+
       // 切换到新笔记
       const note = this.props.store?.state.notes.find(n => n.id === id);
       this.setState({ note: note || null });
       this._updateContainer();
+
+      // 如果是新笔记，聚焦到标题输入框
+      if (this._isNewNote) {
+        this._focusTitleInput();
+      }
     });
     if (unsubscribeSelect) this._cleanup.push(unsubscribeSelect);
 
@@ -194,6 +217,24 @@ export class NoteEditor {
   _updateTimeDisplay() {
     if (!this.state.note || !this._timeDisplay) return;
     this._timeDisplay.textContent = formatRelativeTime(this.state.note.updatedAt);
+  }
+
+  /**
+   * 聚焦到标题输入框
+   * 用于新建笔记时自动聚焦
+   * @private
+   */
+  _focusTitleInput() {
+    // 使用 setTimeout 确保 DOM 渲染完成
+    setTimeout(() => {
+      if (this._titleInput) {
+        this._titleInput.focus();
+        // 如果有默认文本，选中全部；否则光标在开头
+        if (this._titleInput.value) {
+          this._titleInput.select();
+        }
+      }
+    }, 50);
   }
 
   /**

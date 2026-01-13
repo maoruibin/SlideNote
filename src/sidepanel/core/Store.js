@@ -11,6 +11,7 @@ import { bus } from './EventBus.js';
 const STORAGE_KEYS = {
   NOTES: 'slidenote_notes',
   ACTIVE_NOTE_ID: 'slidenote_active_id',
+  SIDEBAR_COLLAPSED: 'slidenote_sidebar_collapsed',
 };
 
 /**
@@ -60,6 +61,7 @@ export class Store extends EventEmitter {
       notes: [],
       activeNoteId: null,
       searchQuery: '',
+      sidebarCollapsed: false,  // 侧边栏折叠状态
     };
     this._ready = false;
     this._localChanges = new Map();  // 跟踪本地变更的时间戳
@@ -82,10 +84,12 @@ export class Store extends EventEmitter {
     const result = await chrome.storage.sync.get({
       [STORAGE_KEYS.NOTES]: [],
       [STORAGE_KEYS.ACTIVE_NOTE_ID]: null,
+      [STORAGE_KEYS.SIDEBAR_COLLAPSED]: false,
     });
 
     this.state.notes = result[STORAGE_KEYS.NOTES] || [];
     this.state.activeNoteId = result[STORAGE_KEYS.ACTIVE_NOTE_ID];
+    this.state.sidebarCollapsed = result[STORAGE_KEYS.SIDEBAR_COLLAPSED] || false;
 
     // 按创建时间倒序排序
     this._sortNotes();
@@ -96,14 +100,14 @@ export class Store extends EventEmitter {
 
   /**
    * 创建新笔记
-   * @returns {Promise<Object>}
+   * @returns {Promise<Object>} 返回笔记对象，包含 isNew 标记
    */
   async createNote() {
     // 计算新的 order 值（最小值 - 1，放在最前面）
     const minOrder = Math.min(...this.state.notes.map(n => n.order ?? 0), 0);
     const note = {
       id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      title: '未命名笔记',
+      title: '',  // 新建笔记时标题为空
       content: '',
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -117,7 +121,8 @@ export class Store extends EventEmitter {
     this.emit('change');
     this.emit('note-created', note);
 
-    return note;
+    // 返回笔记对象 + isNew 标记（用于 UI 聚焦处理）
+    return { ...note, isNew: true };
   }
 
   /**
@@ -384,6 +389,26 @@ export class Store extends EventEmitter {
    */
   _sortNotes() {
     this.state.notes.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+  }
+
+  /**
+   * 切换侧边栏折叠状态
+   * @param {boolean} collapsed 是否折叠
+   */
+  async setSidebarCollapsed(collapsed) {
+    this.state.sidebarCollapsed = collapsed;
+    await chrome.storage.sync.set({
+      [STORAGE_KEYS.SIDEBAR_COLLAPSED]: collapsed,
+    });
+    this.emit('sidebar-toggled', collapsed);
+  }
+
+  /**
+   * 获取侧边栏折叠状态
+   * @returns {boolean}
+   */
+  isSidebarCollapsed() {
+    return this.state.sidebarCollapsed;
   }
 }
 

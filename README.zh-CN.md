@@ -17,7 +17,7 @@
 <p align="center">
   <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
-  <a href="https://chromewebstore.google.com/detail/slidenote/"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-Ready-green"></a>
+  <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-在线安装-green"></a>
 </p>
 
 ---
@@ -46,7 +46,26 @@
 
 ## 📦 安装
 
-### 方式一：从源码安装
+### 方式一：Chrome 应用商店（推荐）
+
+<a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom">
+  <img src="https://storage.googleapis.com/web-dev-uploads/image/WbDnF6242M_4vTb4X3r3zgA7j10/WbDnF6242M_4vTb4X3r3zgA7j10_1714145428342.png" alt="从 Chrome 应用商店安装" width="200">
+</a>
+
+[点击此处前往 Chrome 应用商店安装](https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom)
+
+### 方式二：本地下载安装
+
+从 [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) 下载最新版本：
+
+1. 下载并解压安装包
+2. 打开 Chrome 浏览器
+3. 访问 `chrome://extensions/`
+4. 开启右上角的「开发者模式」
+5. 点击「加载已解压的扩展程序」
+6. 选择解压后的文件夹
+
+### 方式三：从源码构建
 
 ```bash
 # 克隆仓库
@@ -56,8 +75,8 @@ cd SlideNote
 # 安装依赖
 npm install
 
-# 构建
-npm run build
+# 构建正式版
+npm run build:prod
 ```
 
 1. 打开 Chrome 浏览器
@@ -65,10 +84,6 @@ npm run build
 3. 开启右上角的「开发者模式」
 4. 点击「加载已解压的扩展程序」
 5. 选择项目根目录的 `dist` 文件夹
-
-### 方式二：Chrome 应用商店
-
-搜索「SlideNote」一键安装
 
 ---
 

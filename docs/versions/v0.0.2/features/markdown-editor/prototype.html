@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlideNote Markdown 编辑器原型 - v0.0.2</title>
+  <style>
+    /* ============================================
+       SlideNote Markdown 编辑器原型 - v0.0.2
+       ============================================ */
+
+    /* CSS Variables - 设计系统 */
+    :root {
+      /* === 基础色彩 === */
+      --color-bg-primary: #ffffff;
+      --color-bg-secondary: #f5f5f5;
+      --color-bg-hover: #e8e8e8;
+      --color-bg-active: #f0f7ff;
+      --color-text-primary: #1a1a1a;
+      --color-text-secondary: #666666;
+      --color-text-tertiary: #999999;
+      --color-text-placeholder: #bbbbbb;
+      --color-border: #e5e5e5;
+      --color-border-focus: #0066cc;
+      --color-primary: #0066cc;
+      --color-primary-light: #f0f7ff;
+      --color-error: #ff4444;
+      --color-success: #22c55e;
+      --color-overlay: rgba(0, 0, 0, 0.4);
+
+      /* === Markdown 专用色彩 === */
+      --color-md-delimiter: rgba(102, 102, 102, 0.25);
+      --color-md-code-bg: #f8f9fa;
+      --color-md-code-text: #e83e8c;
+      --color-md-link: #0066cc;
+      --color-md-link-hover: #0052a3;
+      --color-md-quote-bg: #f8f9fa;
+      --color-md-quote-border: #dee2e6;
+      --color-md-hr: #e5e5e5;
+      --color-md-list-bullet: rgba(102, 102, 102, 0.5);
+
+      /* === 字体 === */
+      --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --font-family-mono: "SF Mono", Consolas, "Monaco", "Courier New", monospace;
+      --font-size-xs: 11px;
+      --font-size-sm: 12px;
+      --font-size-base: 13px;
+      --font-size-md: 14px;
+      --font-size-lg: 16px;
+      --font-size-xl: 20px;
+
+      /* === Markdown 尺寸 === */
+      --md-h1-size: 20px;
+      --md-h2-size: 16px;
+      --md-h3-size: 14px;
+      --md-code-size: 12px;
+      --md-code-padding: 2px 6px;
+      --md-code-block-padding: 12px;
+      --md-quote-padding: 8px 12px;
+      --md-list-indent: 18px;
+
+      /* === Markdown 间距 === */
+      --md-h1-margin-top: 16px;
+      --md-h1-margin-bottom: 8px;
+      --md-h2-margin-top: 12px;
+      --md-h2-margin-bottom: 6px;
+      --md-h3-margin-top: 8px;
+      --md-h3-margin-bottom: 4px;
+      --md-blockquote-margin: 8px;
+      --md-hr-margin: 16px;
+
+      /* === 间距 === */
+      --spacing-xs: 3px;
+      --spacing-sm: 6px;
+      --spacing-md: 12px;
+      --spacing-lg: 18px;
+      --spacing-xl: 24px;
+
+      /* === 圆角 === */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+
+      /* === 阴影 === */
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+      /* === 动画 === */
+      --duration-fast: 150ms;
+      --duration-base: 200ms;
+      --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family-base);
+      font-size: var(--font-size-base);
+      color: var(--color-text-primary);
+      background: linear-gradient(135deg, #e0e0e0 0%, #e8e8e8 100%);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: var(--spacing-lg);
+      gap: var(--spacing-xl);
+    }
+
+    input, textarea, button {
+      font: inherit;
+      color: inherit;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    textarea {
+      resize: none;
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: 2px;
+    }
+
+    /* ============================================
+       原型容器
+       ============================================ */
+    .prototype-wrapper {
+      background: transparent;
+      border-radius: var(--radius-lg);
+    }
+
+    .prototype-label {
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--spacing-md);
+      font-weight: 500;
+    }
+
+    /* ============================================
+       SlideNote 侧边栏
+       ============================================ */
+    .slidenote-sidebar {
+      width: 480px;
+      height: 600px;
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ============================================
+       左侧：笔记列表
+       ============================================ */
+    .note-list-section {
+      width: 180px;
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      height: 44px;
+    }
+
+    .btn-new-note {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-md);
+      height: 32px;
+      color: var(--color-primary);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    .btn-new-note:hover {
+      background: var(--color-primary-light);
+    }
+
+    .btn-new-note svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .note-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-sm);
+    }
+
+    .note-item {
+      position: relative;
+      padding: var(--spacing-sm) var(--spacing-md);
+      margin-bottom: 2px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .note-item.active {
+      background: var(--color-bg-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .note-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--color-primary);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .note-item-title {
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--color-text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-item-preview {
+      font-size: 10px;
+      color: var(--color-text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    /* ============================================
+       右侧：编辑器区域
+       ============================================ */
+    .note-content-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-primary);
+    }
+
+    .note-header {
+      padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--spacing-md);
+    }
+
+    .note-title-input {
+      flex: 1;
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .note-title-input::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    /* 更多按钮 */
+    .btn-more {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      border-radius: var(--radius-md);
+      transition: all var(--duration-fast);
+      flex-shrink: 0;
+    }
+
+    .btn-more:hover,
+    .btn-more.active {
+      background: var(--color-bg-hover);
+      color: var(--color-text-secondary);
+    }
+
+    .btn-more svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ============================================
+       更多菜单
+       ============================================ */
+    .more-menu {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      width: 180px;
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border);
+      z-index: 100;
+      display: none;
+      animation: menuSlideIn 150ms var(--ease-out);
+    }
+
+    .more-menu.show {
+      display: block;
+    }
+
+    @keyframes menuSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .more-menu-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-md);
+      height: 36px;
+      font-size: var(--font-size-base);
+      color: var(--color-text-primary);
+      transition: background var(--duration-fast);
+    }
+
+    .more-menu-item:first-child {
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .more-menu-item:last-child {
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    .more-menu-item:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .more-menu-item svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-tertiary);
+    }
+
+    .more-menu-divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: var(--spacing-xs) 0;
+    }
+
+    /* ============================================
+       Markdown 编辑器
+       ============================================ */
+    .note-editor {
+      flex: 1;
+      padding: var(--spacing-lg);
+      overflow-y: auto;
+    }
+
+    .markdown-editor {
+      width: 100%;
+      min-height: 100%;
+      font-size: var(--font-size-sm);
+      line-height: 1.7;
+      color: var(--color-text-primary);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* === Markdown 渲染样式 === */
+
+    /* Markdown 分隔符（半透明） */
+    .md-delimiter {
+      color: var(--color-md-delimiter);
+      transition: opacity var(--duration-fast);
+    }
+
+    /* 标题 */
+    .md-h1 {
+      font-size: var(--md-h1-size);
+      font-weight: 600;
+      margin-top: var(--md-h1-margin-top);
+      margin-bottom: var(--md-h1-margin-bottom);
+      line-height: 1.3;
+    }
+
+    .md-h2 {
+      font-size: var(--md-h2-size);
+      font-weight: 600;
+      margin-top: var(--md-h2-margin-top);
+      margin-bottom: var(--md-h2-margin-bottom);
+      line-height: 1.3;
+    }
+
+    .md-h3 {
+      font-size: var(--md-h3-size);
+      font-weight: 600;
+      margin-top: var(--md-h3-margin-top);
+      margin-bottom: var(--md-h3-margin-bottom);
+      line-height: 1.3;
+    }
+
+    /* 粗体 */
+    .md-bold {
+      font-weight: 600;
+    }
+
+    /* 斜体 */
+    .md-italic {
+      font-style: italic;
+    }
+
+    /* 行内代码 */
+    .md-inline-code {
+      font-family: var(--font-family-mono);
+      font-size: var(--md-code-size);
+      background: var(--color-md-code-bg);
+      color: var(--color-md-code-text);
+      padding: var(--md-code-padding);
+      border-radius: var(--radius-sm);
+    }
+
+    /* 代码块 */
+    .md-code-block {
+      font-family: var(--font-family-mono);
+      font-size: var(--md-code-size);
+      background: var(--color-md-code-bg);
+      padding: var(--md-code-block-padding);
+      border-radius: var(--radius-md);
+      margin: var(--spacing-sm) 0;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    /* 链接 */
+    .md-link {
+      color: var(--color-md-link);
+      text-decoration: underline;
+      transition: color var(--duration-fast);
+    }
+
+    .md-link:hover {
+      color: var(--color-md-link-hover);
+    }
+
+    .md-link-url {
+      color: var(--color-md-delimiter);
+      text-decoration: none;
+    }
+
+    /* 列表 */
+    .md-list-item {
+      padding-left: var(--md-list-indent);
+      position: relative;
+      margin: 2px 0;
+    }
+
+    .md-list-item::before {
+      content: '•';
+      position: absolute;
+      left: 4px;
+      color: var(--color-md-list-bullet);
+    }
+
+    .md-ordered-item {
+      padding-left: var(--md-list-indent);
+      margin: 2px 0;
+    }
+
+    .md-ordered-num {
+      color: var(--color-md-delimiter);
+    }
+
+    /* 引用 */
+    .md-blockquote {
+      background: var(--color-md-quote-bg);
+      border-left: 3px solid var(--color-md-quote-border);
+      padding: var(--md-quote-padding);
+      margin: var(--md-blockquote-margin) 0;
+      color: var(--color-text-secondary);
+    }
+
+    .md-blockquote .md-delimiter {
+      color: var(--color-md-delimiter);
+    }
+
+    /* 分割线 */
+    .md-hr {
+      border: none;
+      border-top: 1px solid var(--color-md-hr);
+      margin: var(--md-hr-margin) 0;
+    }
+
+    .md-hr-delimiter {
+      display: none;
+    }
+
+    /* 编辑器底部状态 */
+    .note-footer {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .note-save-status {
+      font-size: var(--font-size-xs);
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .note-time {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    /* ============================================
+       Toast 提示
+       ============================================ */
+    .toast {
+      position: absolute;
+      top: 60px;
+      right: 16px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--color-text-primary);
+      color: white;
+      font-size: var(--font-size-sm);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      display: none;
+      align-items: center;
+      gap: var(--spacing-sm);
+      animation: toastFadeIn 150ms var(--ease-out);
+    }
+
+    .toast.show {
+      display: flex;
+    }
+
+    @keyframes toastFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================
+       模态框 - 语法提示
+       ============================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-overlay);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 360px;
+      max-width: 90vw;
+      animation: modalFadeIn 200ms var(--ease-out);
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-tertiary);
+      border-radius: var(--radius-sm);
+      font-size: 18px;
+    }
+
+    .modal-close:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .modal-body {
+      padding: var(--spacing-lg);
+    }
+
+    /* 语法表格 */
+    .syntax-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+
+    .syntax-table th {
+      text-align: left;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      padding: var(--spacing-sm) var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .syntax-table td {
+      padding: var(--spacing-md) var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .syntax-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .syntax-code {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      background: var(--color-bg-secondary);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .syntax-preview {
+      color: var(--color-text-primary);
+    }
+
+    .syntax-tip {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--color-primary-light);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-xs);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    /* ============================================
+       展示区：Markdown 样式参考
+       ============================================ */
+    .showcase-section {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-lg);
+      max-width: 480px;
+    }
+
+    .showcase-title {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .showcase-item {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .showcase-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .showcase-demo {
+      padding: var(--spacing-md);
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 状态 1：默认编辑状态 -->
+  <div class="prototype-wrapper">
+    <div class="prototype-label">SlideNote Markdown 编辑器 — v0.0.2</div>
+
+    <div class="slidenote-sidebar" style="position: relative;">
+      <!-- 左侧笔记列表 -->
+      <div class="note-list-section">
+        <div class="toolbar">
+          <button class="btn-new-note">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            新建笔记
+          </button>
+        </div>
+
+        <div class="note-list">
+          <div class="note-item active">
+            <div class="note-item-title">Markdown 语法测试</div>
+            <div class="note-item-preview">标题 · 粗体 · 代码 · 列表</div>
+          </div>
+
+          <div class="note-item">
+            <div class="note-item-title">会议记录</div>
+            <div class="note-item-preview">Q1 规划 · 待办事项</div>
+          </div>
+
+          <div class="note-item">
+            <div class="note-item-title">API 文档</div>
+            <div class="note-item-preview">接口 · 参数 · 示例</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧编辑器 -->
+      <div class="note-content-section">
+        <div class="note-header">
+          <input type="text" class="note-title-input" value="Markdown 语法测试" placeholder="未命名笔记">
+
+          <!-- 更多按钮 -->
+          <button class="btn-more" id="moreBtn" onclick="toggleMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="3" r="1.5"/>
+              <circle cx="8" cy="8" r="1.5"/>
+              <circle cx="8" cy="13" r="1.5"/>
+            </svg>
+          </button>
+
+          <!-- 更多菜单 -->
+          <div class="more-menu" id="moreMenu">
+            <div class="more-menu-item" onclick="copyMarkdown()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="5" width="8" height="10" rx="1"/>
+                <path d="M5 5V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v10"/>
+              </svg>
+              复制为 Markdown
+            </div>
+            <div class="more-menu-divider"></div>
+            <div class="more-menu-item" onclick="showSyntaxHelp()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="8" r="7" fill-opacity="0.1"/>
+                <circle cx="8" cy="4" r="1"/>
+                <path d="M8 7v5"/>
+              </svg>
+              语法快捷键提示
+            </div>
+          </div>
+        </div>
+
+        <!-- Markdown 编辑器内容 -->
+        <div class="note-editor">
+          <div class="markdown-editor">
+            <div class="md-h1">
+              <span class="md-delimiter"># </span>项目计划
+            </div>
+
+            <div class="md-h2">
+              <span class="md-delimiter">## </span>待办事项
+            </div>
+
+            <div class="md-list-item"><span class="md-delimiter"></span>完成 API 设计</div>
+            <div class="md-list-item"><span class="md-delimiter"></span>编写测试用例</div>
+            <div class="md-list-item"><span class="md-delimiter"></span>部署到测试环境</div>
+
+            <div class="md-h2">
+              <span class="md-delimiter">## </span>重要提醒
+            </div>
+
+            <div class="md-blockquote">
+              <span class="md-delimiter"> </span>记得给 <span class="md-bold">张三</span> 发邮件，主题是 <span class="md-inline-code">Q1规划</span>
+            </div>
+
+            <div class="md-h2">
+              <span class="md-delimiter">## </span>技术细节
+            </div>
+
+            <div>接口文档：<span class="md-link">查看这里<span class="md-link-url">(https://api.example.com)</span></span></div>
+
+            <div>代码示例：</div>
+
+            <div class="md-code-block">function hello() {
+  console.log(<span class="md-delimiter"</span>Hello World<span class="md-delimiter"</span>);
+}
+            </div>
+
+            <div class="md-hr"></div>
+
+            <div class="md-h3">
+              <span class="md-delimiter">### </span>备注
+            </div>
+
+            <div>使用 <span class="md-italic">Git</span> 管理版本，<span class="md-bold">不要</span> 直接提交到主分支。</div>
+          </div>
+        </div>
+
+        <div class="note-footer">
+          <div class="note-save-status">✓ 已保存</div>
+          <div class="note-time">最后编辑 3 分钟前</div>
+        </div>
+
+        <!-- Toast 提示 -->
+        <div class="toast" id="toast">
+          ✓ 已复制 Markdown 源码到剪贴板
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 展示区：Markdown 样式参考 -->
+  <div class="showcase-section">
+    <div class="showcase-title">Markdown 语法样式参考</div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">标题 (H1-H3)</div>
+      <div class="showcase-demo">
+        <div style="font-size: 20px; font-weight: 600; margin: 4px 0;"><span style="opacity: 0.3;"># </span>一级标题</div>
+        <div style="font-size: 16px; font-weight: 600; margin: 4px 0;"><span style="opacity: 0.3;">## </span>二级标题</div>
+        <div style="font-size: 14px; font-weight: 600; margin: 4px 0;"><span style="opacity: 0.3;">### </span>三级标题</div>
+      </div>
+    </div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">文本格式</div>
+      <div class="showcase-demo">
+        <span style="font-weight: 600;"><span style="opacity: 0.3;">**</span>粗体文本<span style="opacity: 0.3;">**</span></span>
+        &nbsp;&nbsp;
+        <span style="font-style: italic;"><span style="opacity: 0.3;">*</span>斜体文本<span style="opacity: 0.3;">*</span></span>
+        &nbsp;&nbsp;
+        <code style="background: #f8f9fa; color: #e83e8c; padding: 2px 6px; border-radius: 4px; font-size: 12px;"><span style="opacity: 0.3;">`</span>行内代码<span style="opacity: 0.3;">`</span></code>
+      </div>
+    </div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">链接</div>
+      <div class="showcase-demo">
+        <span style="color: #0066cc; text-decoration: underline;">[文本]</span><span style="opacity: 0.3;">(https://example.com)</span>
+      </div>
+    </div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">列表</div>
+      <div class="showcase-demo">
+        <div style="padding-left: 18px; position: relative;"><span style="position: absolute; left: 4px; opacity: 0.5;">•</span> 无序列表项</div>
+        <div style="padding-left: 18px; position: relative;"><span style="position: absolute; left: 4px; opacity: 0.5;">•</span> 另一个项目</div>
+      </div>
+    </div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">引用</div>
+      <div class="showcase-demo">
+        <div style="background: #f8f9fa; border-left: 3px solid #dee2e6; padding: 8px 12px; color: #666;">
+          <span style="opacity: 0.3;">> </span>这是一段引用文字
+        </div>
+      </div>
+    </div>
+
+    <div class="showcase-item">
+      <div class="showcase-label">分割线</div>
+      <div class="showcase-demo">
+        <div style="border-top: 1px solid #e5e5e5; margin: 8px 0;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 语法提示模态框 -->
+  <div class="modal-overlay" id="syntaxModal" onclick="closeSyntaxHelp(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">Markdown 语法提示</div>
+        <button class="modal-close" onclick="closeSyntaxHelp()">×</button>
+      </div>
+      <div class="modal-body">
+        <table class="syntax-table">
+          <thead>
+            <tr>
+              <th>格式</th>
+              <th>语法</th>
+              <th>效果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>粗体</td>
+              <td><code class="syntax-code">**文本**</code></td>
+              <td><span class="syntax-preview" style="font-weight: 600;">粗体</span></td>
+            </tr>
+            <tr>
+              <td>斜体</td>
+              <td><code class="syntax-code">*文本*</code></td>
+              <td><span class="syntax-preview" style="font-style: italic;">斜体</span></td>
+            </tr>
+            <tr>
+              <td>行内代码</td>
+              <td><code class="syntax-code">`代码`</code></td>
+              <td><span class="syntax-preview"><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 11px;">代码</code></span></td>
+            </tr>
+            <tr>
+              <td>链接</td>
+              <td><code class="syntax-code">[文本](url)</code></td>
+              <td><span class="syntax-preview" style="color: #0066cc;">链接</span></td>
+            </tr>
+            <tr>
+              <td>标题</td>
+              <td><code class="syntax-code"># 标题</code></td>
+              <td><span class="syntax-preview" style="font-weight: 600;">大号文字</span></td>
+            </tr>
+            <tr>
+              <td>列表</td>
+              <td><code class="syntax-code">- 项目</code></td>
+              <td><span class="syntax-preview">• 项目</span></td>
+            </tr>
+            <tr>
+              <td>引用</td>
+              <td><code class="syntax-code">&gt; 引用</code></td>
+              <td><span class="syntax-preview" style="background: #f8f9fa; padding: 2px 6px; border-left: 2px solid #dee2e6;">引用</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="syntax-tip">
+          <span>💡</span>
+          <span>提示：分隔符会自动变淡，不会影响阅读</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 切换更多菜单
+    function toggleMenu() {
+      const menu = document.getElementById('moreMenu');
+      const btn = document.getElementById('moreBtn');
+      menu.classList.toggle('show');
+      btn.classList.toggle('active');
+    }
+
+    // 点击其他地方关闭菜单
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('moreMenu');
+      const btn = document.getElementById('moreBtn');
+      if (!menu.contains(e.target) && !btn.contains(e.target)) {
+        menu.classList.remove('show');
+        btn.classList.remove('active');
+      }
+    });
+
+    // 复制 Markdown
+    function copyMarkdown() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+      toggleMenu();
+    }
+
+    // 显示语法帮助
+    function showSyntaxHelp() {
+      document.getElementById('syntaxModal').classList.add('show');
+      toggleMenu();
+    }
+
+    // 关闭语法帮助
+    function closeSyntaxHelp(e) {
+      if (!e || e.target === document.getElementById('syntaxModal')) {
+        document.getElementById('syntaxModal').classList.remove('show');
+      }
+    }
+
+    // ESC 关闭模态框
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.getElementById('syntaxModal').classList.remove('show');
+        document.getElementById('moreMenu').classList.remove('show');
+        document.getElementById('moreBtn').classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -21,6 +21,8 @@ class App {
     this.syncManager = null;
     this.components = {};
     this.dialog = null;
+    this._listSection = null;  // 笔记列表区域引用
+    this._collapseBtn = null;  // 折叠按钮引用
   }
 
   /**
@@ -41,6 +43,9 @@ class App {
     // 设置全局事件监听
     this._setupGlobalListeners();
 
+    // 初始化侧边栏折叠状态
+    this._initSidebarState();
+
     console.log('SlideNote initialized');
   }
 
@@ -58,6 +63,7 @@ class App {
     // 创建左侧笔记列表区域
     const listSection = document.createElement('div');
     listSection.className = 'note-list-section';
+    this._listSection = listSection;
 
     // 顶部工具栏
     this.components.toolbar = new Toolbar({ bus });
@@ -117,6 +123,10 @@ class App {
     footer.appendChild(appFooter);
     listSection.appendChild(footer);
 
+    // 添加侧边栏折叠/展开按钮
+    this._collapseBtn = this._createCollapseButton();
+    listSection.appendChild(this._collapseBtn);
+
     // 创建右侧内容区域
     const contentSection = document.createElement('div');
     contentSection.className = 'note-content-section';
@@ -136,15 +146,22 @@ class App {
    * @private
    */
   _setupGlobalListeners() {
-    // 新建笔记
+    // 新建笔记 - 传递 isNew 标记用于自动聚焦标题
     bus.on('note:create', async () => {
-      const note = await this.store.createNote();
-      bus.emit('note:select', note.id);
+      // 侧边栏折叠时自动展开
+      await this.expandSidebar();
+      const result = await this.store.createNote();
+      bus.emit('note:select', result.id, { isNew: result.isNew });
     });
 
     // 删除笔记请求
     bus.on('note:delete-request', (note) => {
       this._showDeleteConfirm(note);
+    });
+
+    // 搜索展开时自动展开侧边栏
+    bus.on('search:expand', async () => {
+      await this.expandSidebar();
     });
   }
 
@@ -226,6 +243,102 @@ class App {
     link.appendChild(qrPopup);
 
     return link;
+  }
+
+  /**
+   * 创建侧边栏折叠/展开按钮
+   * @private
+   */
+  _createCollapseButton() {
+    const btn = document.createElement('button');
+    btn.className = 'sidebar-collapse-btn';
+    // 向左箭头（收起）
+    btn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="11 17 6 12 11 7"/>
+      </svg>
+    `;
+    btn.title = '收起侧边栏';
+    btn.onclick = () => this._toggleSidebar();
+
+    return btn;
+  }
+
+  /**
+   * 切换侧边栏折叠状态
+   * @private
+   */
+  async _toggleSidebar() {
+    const isCollapsed = this.store.isSidebarCollapsed();
+    const newState = !isCollapsed;
+
+    // 更新按钮状态
+    this._updateCollapseButton(newState);
+
+    // 更新 CSS 类
+    if (newState) {
+      this._listSection.classList.add('collapsed');
+      this._collapseBtn.title = '展开侧边栏';
+    } else {
+      this._listSection.classList.remove('collapsed');
+      this._collapseBtn.title = '收起侧边栏';
+    }
+
+    // 持久化状态
+    await this.store.setSidebarCollapsed(newState);
+  }
+
+  /**
+   * 更新折叠按钮的显示状态
+   * @param {boolean} isCollapsed
+   * @private
+   */
+  _updateCollapseButton(isCollapsed) {
+    if (!this._collapseBtn) return;
+
+    if (isCollapsed) {
+      // 切换为展开按钮样式（向右箭头，圆形按钮）
+      this._collapseBtn.className = 'sidebar-expand-btn';
+      this._collapseBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 14 12 9 7"/>
+        </svg>
+      `;
+      this._collapseBtn.setAttribute('data-tooltip', '展开侧边栏');
+    } else {
+      // 切换为折叠按钮样式（向左箭头，窄长按钮）
+      this._collapseBtn.className = 'sidebar-collapse-btn';
+      this._collapseBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="11 17 6 12 11 7"/>
+        </svg>
+      `;
+      this._collapseBtn.title = '收起侧边栏';
+    }
+  }
+
+  /**
+   * 初始化侧边栏折叠状态
+   * @private
+   */
+  _initSidebarState() {
+    const isCollapsed = this.store.isSidebarCollapsed();
+
+    if (isCollapsed) {
+      this._listSection.classList.add('collapsed');
+      this._updateCollapseButton(true);
+    }
+  }
+
+  /**
+   * 展开侧边栏（在需要时调用）
+   */
+  async expandSidebar() {
+    if (!this.store.isSidebarCollapsed()) return;
+
+    this._listSection.classList.remove('collapsed');
+    this._updateCollapseButton(false);
+    await this.store.setSidebarCollapsed(false);
   }
 }
 
