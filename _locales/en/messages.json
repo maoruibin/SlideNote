@@ -122,5 +122,61 @@
   "lastEdited": {
     "message": "Last edited",
     "description": "Last edited time"
+  },
+  "copyAsMarkdown": {
+    "message": "Copy as Markdown",
+    "description": "Copy as Markdown source"
+  },
+  "copyAsRichText": {
+    "message": "Copy as Rich Text",
+    "description": "Copy as rich text (with styling)"
+  },
+  "syntaxHelp": {
+    "message": "Syntax Quick Reference",
+    "description": "Markdown syntax help"
+  },
+  "copiedMarkdown": {
+    "message": "Markdown source copied to clipboard",
+    "description": "Copy success message"
+  },
+  "copiedRichText": {
+    "message": "Rich text copied to clipboard",
+    "description": "Copy rich text success message"
+  },
+  "copiedPlainText": {
+    "message": "Plain text copied to clipboard",
+    "description": "Copy plain text success message"
+  },
+  "copyFailed": {
+    "message": "Copy failed",
+    "description": "Copy failed message"
+  },
+  "markdownSyntaxTitle": {
+    "message": "Markdown Syntax Reference",
+    "description": "Syntax help modal title"
+  },
+  "syntaxTip": {
+    "message": "Tip: Delimiters fade automatically, won't affect reading",
+    "description": "Syntax tip description"
+  },
+  "togglePreview": {
+    "message": "Toggle Preview",
+    "description": "Toggle preview mode button"
+  },
+  "previewMode": {
+    "message": "Preview Mode",
+    "description": "Preview mode"
+  },
+  "editMode": {
+    "message": "Edit Mode",
+    "description": "Edit mode"
+  },
+  "editNote": {
+    "message": "Edit",
+    "description": "Edit note button"
+  },
+  "previewNote": {
+    "message": "Preview",
+    "description": "Preview note button"
   }
 }

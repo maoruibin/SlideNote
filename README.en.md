@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.3-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-Online-green"></a>
 </p>
@@ -23,11 +23,13 @@
 ## Features
 
 - **Sidebar Display** — Fixed in browser sidebar, always accessible
+- **Markdown Editor** — Preview/edit mode toggle with real-time rendering
+- **Rich Text Copy** — Copy with styling, paste directly into other apps
 - **Auto Save** — Automatically saves 1 second after you stop typing
 - **Cross-device Sync** — Cloud sync via Chrome Storage API
 - **Search Filter** — Real-time search through titles and content
-- **Note Ordering** — Right-click menu to reorder notes
-- **Ultra Lightweight** — No framework dependencies, bundle size only 20KB
+- **Navigation Arrows** — Quickly switch between notes with up/down arrows
+- **Ultra Lightweight** — No framework dependencies, bundle size only 24KB
 
 ---
 
@@ -142,7 +144,16 @@ Consistent border radius →  Gentle, not sharp
 
 ## Roadmap
 
-### v0.0.1 (Current)
+### v0.0.3 (Current)
+- [x] Markdown editor with preview/edit mode toggle
+- [x] Copy as rich text (with styling)
+- [x] Copy as Markdown source
+- [x] Navigation arrows (prev/next note)
+- [x] Per-note view mode memory
+- [x] Markdown syntax help modal
+- [x] All v0.0.1 features
+
+### v0.0.2
 - [x] Basic CRUD
 - [x] Auto save
 - [x] Cross-device sync
@@ -150,7 +161,7 @@ Consistent border radius →  Gentle, not sharp
 - [x] Note ordering (right-click menu)
 - [x] UI optimization (adaptive width, remove focus borders)
 
-### v0.0.2 (Planned)
+### v0.0.4 (Planned)
 - [ ] Note grouping/tags
 - [ ] Data export (JSON/Markdown)
 - [ ] Keyboard shortcuts

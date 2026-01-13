@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.1-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.3-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-在线安装-green"></a>
 </p>
@@ -25,11 +25,13 @@
 ## ✨ 特性
 
 - **📌 侧边栏展示** — 固定在浏览器侧边，随时可用
+- **✍️ Markdown 编辑** — 支持预览/编辑模式，实时渲染
+- **📋 富文本复制** — 复制带样式的文本，可直接粘贴到其他应用
 - **💾 自动保存** — 停止输入 1 秒后自动保存
 - **🔄 跨设备同步** — 基于 Chrome Storage API，自动云端同步
 - **🔍 搜索过滤** — 实时搜索标题和内容
-- **📋 笔记排序** — 右键菜单，自由调整笔记顺序
-- **⚡️ 极致轻量** — 无框架依赖，打包仅 20KB
+- **⬆️⬇️ 导航切换** — 上下箭头快速切换笔记
+- **⚡️ 极致轻量** — 无框架依赖，打包仅 24KB
 
 ---
 
@@ -144,7 +146,16 @@ slidenote/
 
 ## 🗺️ 路线图
 
-### v0.0.1（当前版本）
+### v0.0.3（当前版本）
+- [x] Markdown 编辑器（预览/编辑模式切换）
+- [x] 富文本复制（带样式）
+- [x] Markdown 源码复制
+- [x] 笔记导航箭头（上一篇/下一篇）
+- [x] 每笔记独立记忆浏览模式
+- [x] Markdown 语法帮助弹窗
+- [x] 所有 v0.0.1 功能
+
+### v0.0.2
 - [x] 基础 CRUD
 - [x] 自动保存
 - [x] 跨设备同步
@@ -152,7 +163,7 @@ slidenote/
 - [x] 笔记排序（右键菜单）
 - [x] UI 优化
 
-### v0.0.2（计划中）
+### v0.0.4（计划中）
 - [ ] 笔记分组/标签
 - [ ] 数据导出（JSON/Markdown）
 - [ ] 快捷键支持

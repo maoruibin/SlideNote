@@ -46,6 +46,9 @@ class App {
     // 初始化侧边栏折叠状态
     this._initSidebarState();
 
+    // 恢复上次选中的笔记
+    this._restoreActiveNote();
+
     console.log('SlideNote initialized');
   }
 
@@ -83,15 +86,17 @@ class App {
     const appFooter = document.createElement('div');
     appFooter.className = 'app-footer';
 
-    // 作者链接
+    // 作者链接（根据语言环境选择不同链接）
     const authorDiv = document.createElement('div');
     authorDiv.className = 'footer-author';
     const author = t('author');
     const developedByText = t('developedBy', [author]);
-    // 使用 lastEdited 标记作为链接插入点
+    // 中文用 blog，英文用 dev.to
+    const uiLang = chrome.i18n.getUILanguage();
+    const authorUrl = uiLang.startsWith('zh') ? 'https://blog.gudong.site/' : 'https://dev.to/gudong';
     authorDiv.innerHTML = developedByText.replace(
       author,
-      `<a href="https://blog.gudong.site/" target="_blank" class="author-link">${author}</a>`
+      `<a href="${authorUrl}" target="_blank" class="author-link">${author}</a>`
     );
 
     // 社交链接
@@ -146,12 +151,16 @@ class App {
    * @private
    */
   _setupGlobalListeners() {
-    // 新建笔记 - 传递 isNew 标记用于自动聚焦标题
+    // 新建笔记 - 延迟触发编辑模式
     bus.on('note:create', async () => {
       // 侧边栏折叠时自动展开
       await this.expandSidebar();
       const result = await this.store.createNote();
-      bus.emit('note:select', result.id, { isNew: result.isNew });
+      bus.emit('note:select', result.id);
+      // 延迟触发编辑模式（等待渲染完成）
+      setTimeout(() => {
+        bus.emit('editor:set-edit-mode');
+      }, 300);
     });
 
     // 删除笔记请求
@@ -339,6 +348,25 @@ class App {
     this._listSection.classList.remove('collapsed');
     this._updateCollapseButton(false);
     await this.store.setSidebarCollapsed(false);
+  }
+
+  /**
+   * 恢复上次选中的笔记
+   * @private
+   */
+  _restoreActiveNote() {
+    const activeNoteId = this.store.state.activeNoteId;
+    if (activeNoteId) {
+      // 检查笔记是否还存在
+      const noteExists = this.store.state.notes.find(n => n.id === activeNoteId);
+      if (noteExists) {
+        // 触发 note:select 事件，让 NoteEditor 加载内容
+        bus.emit('note:select', activeNoteId, { isRestore: true });
+      } else {
+        // 笔记不存在了，清除 activeNoteId
+        this.store.state.activeNoteId = null;
+      }
+    }
   }
 }
 

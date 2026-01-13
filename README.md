@@ -143,7 +143,16 @@ Consistent rounded  →  Gentle, not sharp
 
 ## 🗺️ Roadmap
 
-### v0.0.1 (Current)
+### v0.0.3 (Current)
+- [x] Markdown editor with preview mode
+- [x] Copy as rich text (with styling)
+- [x] Copy as Markdown source
+- [x] Navigation arrows (prev/next note)
+- [x] Per-note view mode memory
+- [x] Syntax help modal
+- [x] All v0.0.1 features
+
+### v0.0.2
 - [x] Basic CRUD
 - [x] Auto-save
 - [x] Cross-device sync
@@ -151,7 +160,7 @@ Consistent rounded  →  Gentle, not sharp
 - [x] Note reordering
 - [x] UI polish
 
-### v0.0.2 (Planned)
+### v0.0.4 (Planned)
 - [ ] Note grouping/tags
 - [ ] Data export (JSON/Markdown)
 - [ ] Keyboard shortcuts

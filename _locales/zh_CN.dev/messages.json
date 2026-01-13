@@ -118,5 +118,69 @@
   "lastEdited": {
     "message": "最后编辑",
     "description": "最后编辑时间"
+  },
+  "copyAsMarkdown": {
+    "message": "复制为 Markdown",
+    "description": "复制为 Markdown 源码"
+  },
+  "copyAsRichText": {
+    "message": "复制为富文本",
+    "description": "复制为富文本（带样式）"
+  },
+  "syntaxHelp": {
+    "message": "语法快捷键提示",
+    "description": "Markdown 语法帮助"
+  },
+  "copiedMarkdown": {
+    "message": "已复制 Markdown 源码到剪贴板",
+    "description": "复制成功提示"
+  },
+  "copiedRichText": {
+    "message": "已复制富文本到剪贴板",
+    "description": "复制富文本成功提示"
+  },
+  "copiedPlainText": {
+    "message": "已复制纯文本到剪贴板",
+    "description": "复制纯文本成功提示"
+  },
+  "copyFailed": {
+    "message": "复制失败",
+    "description": "复制失败提示"
+  },
+  "markdownSyntaxTitle": {
+    "message": "Markdown 语法提示",
+    "description": "语法帮助弹窗标题"
+  },
+  "syntaxTip": {
+    "message": "提示：分隔符会自动变淡，不会影响阅读",
+    "description": "语法提示说明"
+  },
+  "togglePreview": {
+    "message": "切换预览",
+    "description": "切换预览模式按钮"
+  },
+  "previewMode": {
+    "message": "预览模式",
+    "description": "预览模式"
+  },
+  "editMode": {
+    "message": "编辑模式",
+    "description": "编辑模式"
+  },
+  "editNote": {
+    "message": "编辑",
+    "description": "编辑笔记按钮"
+  },
+  "previewNote": {
+    "message": "预览",
+    "description": "预览笔记按钮"
+  },
+  "prevNote": {
+    "message": "上一篇",
+    "description": "导航到上一篇笔记"
+  },
+  "nextNote": {
+    "message": "下一篇",
+    "description": "导航到下一篇笔记"
   }
 }
