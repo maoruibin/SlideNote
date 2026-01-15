@@ -5,14 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prepare-dist.mjs",
-    "build:dev": "vite build && node scripts/prepare-dist.mjs dev",
+    "build": "vite build && node scripts/prepare-dist.mjs dev",
     "build:prod": "vite build && node scripts/prepare-dist.mjs prod",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "package": "node scripts/package.mjs",
-    "package:prod": "npm run build:prod && npm run package",
-    "package:dev": "npm run build:dev && npm run package"
+    "package": "npm run build && node scripts/package.mjs",
+    "package:prod": "npm run build:prod && node scripts/package.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.254",

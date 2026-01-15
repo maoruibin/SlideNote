@@ -249,6 +249,13 @@ export class NoteEditor {
     // 预览层不绑定点击事件，保持只读
     previewLayer.style.display = this._previewMode ? 'block' : 'none';
 
+    // 双击预览区进入编辑模式
+    previewLayer.addEventListener('dblclick', () => {
+      if (this._previewMode) {
+        this._setEditMode();
+      }
+    });
+
     // 输入时保存并更新预览
     textarea.addEventListener('input', () => {
       const content = textarea.textContent || '';

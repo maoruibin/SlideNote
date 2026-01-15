@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlideNote Promo Tiles V2</title>
+  <!-- html2canvas for saving images -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 8px Grid System */
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 40px;
+      --space-6: 48px;
+      --space-7: 56px;
+      --space-8: 64px;
+
+      /* Colors */
+      --color-primary: #667eea;
+      --color-primary-dark: #764ba2;
+      --color-accent: #f093fb;
+      --color-text: #ffffff;
+      --color-text-secondary: rgba(255, 255, 255, 0.85);
+      --color-text-tertiary: rgba(255, 255, 255, 0.7);
+
+      /* Backgrounds */
+      --bg-card: rgba(255, 255, 255, 0.1);
+      --bg-card-hover: rgba(255, 255, 255, 0.15);
+
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #0f0f1a;
+      min-height: 100vh;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .label {
+      color: #666;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+      letter-spacing: 0.5px;
+    }
+
+    /* Tile Wrapper */
+    .tile-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Save Button */
+    .save-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 10px var(--space-3);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .save-btn:active {
+      transform: translateY(0);
+    }
+
+    .save-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .save-btn .icon {
+      font-size: 16px;
+    }
+
+    .save-btn .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: var(--space-4);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #10b981;
+      color: #fff;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ==================== Small Promo Tile (440x280) ==================== */
+    .tile-small {
+      width: 440px;
+      height: 280px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      border-radius: var(--radius-lg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(102, 126, 234, 0.35);
+    }
+
+    .tile-small .decoration {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .tile-small .deco-1 {
+      width: 280px;
+      height: 280px;
+      top: -80px;
+      right: -60px;
+    }
+
+    .tile-small .deco-2 {
+      width: 120px;
+      height: 120px;
+      bottom: -40px;
+      left: -20px;
+    }
+
+    .tile-small .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    .tile-small .logo-section {
+      flex-shrink: 0;
+    }
+
+    .tile-small .logo {
+      width: 88px;
+      height: 88px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .tile-small .logo svg {
+      width: 52px;
+      height: 52px;
+    }
+
+    .tile-small .text-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tile-small .app-name {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+
+    .tile-small .tagline {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--space-2);
+    }
+
+    .tile-small .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .tile-small .feature-tag {
+      padding: 6px 12px;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text);
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+
+    /* English version adjustments */
+    .tile-small.en .app-name {
+      font-size: 26px;
+    }
+
+    .tile-small.en .tagline {
+      font-size: 12px;
+    }
+
+    /* ==================== Marquee Promo Tile (1400x560) ==================== */
+    .tile-marquee {
+      width: 1400px;
+      height: 560px;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 50%, var(--color-accent) 100%);
+      border-radius: var(--radius-xl);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 32px 96px rgba(102, 126, 234, 0.4);
+    }
+
+    .tile-marquee .decoration {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tile-marquee .deco-1 {
+      width: 500px;
+      height: 500px;
+      top: -150px;
+      left: -100px;
+    }
+
+    .tile-marquee .deco-2 {
+      width: 400px;
+      height: 400px;
+      bottom: -120px;
+      right: -80px;
+    }
+
+    .tile-marquee .deco-3 {
+      width: 200px;
+      height: 200px;
+      top: 120px;
+      right: 280px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tile-marquee .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: var(--space-8) var(--space-7);
+      gap: var(--space-7);
+    }
+
+    /* Left Section - Brand */
+    .tile-marquee .left-section {
+      flex: 0 0 480px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tile-marquee .logo-large {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      margin-bottom: var(--space-4);
+    }
+
+    .tile-marquee .logo-large svg {
+      width: 72px;
+      height: 72px;
+    }
+
+    .tile-marquee .app-name-large {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .tile-marquee .tagline-large {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+      font-weight: 400;
+      margin-bottom: var(--space-1);
+      letter-spacing: 2px;
+    }
+
+    .tile-marquee .tagline-sub {
+      font-size: 14px;
+      color: var(--color-text-tertiary);
+      font-weight: 300;
+      margin-bottom: var(--space-3);
+    }
+
+    .tile-marquee .divider {
+      width: 64px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+      margin-bottom: var(--space-4);
+    }
+
+    .tile-marquee .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2) var(--space-4);
+    }
+
+    .tile-marquee .feature-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .tile-marquee .feature-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-card);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .tile-marquee .feature-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text);
+      line-height: 1.3;
+    }
+
+    .tile-marquee .feature-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      display: block;
+    }
+
+    /* Right Section - Split Preview */
+    .tile-marquee .right-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Browser Split Preview */
+    .browser-split {
+      width: 560px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+    }
+
+    .browser-split .browser-header {
+      background: rgba(0, 0, 0, 0.4);
+      padding: var(--space-2) var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .browser-split .browser-dots {
+      display: flex;
+      gap: var(--space-1);
+    }
+
+    .browser-split .browser-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .browser-split .browser-dot.red { background: #ff5f57; }
+    .browser-split .browser-dot.yellow { background: #febc2e; }
+    .browser-split .browser-dot.green { background: #28c840; }
+
+    .browser-split .browser-url {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 6px var(--space-2);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+    }
+
+    .browser-split .browser-body {
+      height: 360px;
+      display: flex;
+    }
+
+    /* Main Content Area (70%) */
+    .browser-split .main-content {
+      flex: 1;
+      background: #ffffff;
+      padding: var(--space-4);
+      position: relative;
+    }
+
+    .browser-split .content-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .browser-split .content-hero {
+      height: 80px;
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-2);
+    }
+
+    .browser-split .content-skeleton {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .browser-split .skeleton-box {
+      flex: 1;
+      height: 48px;
+      background: #f1f5f9;
+      border-radius: var(--radius-sm);
+    }
+
+    .browser-split .content-lines {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .browser-split .content-line {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+    }
+
+    .browser-split .content-line:nth-child(1) { width: 100%; }
+    .browser-split .content-line:nth-child(2) { width: 90%; }
+    .browser-split .content-line:nth-child(3) { width: 70%; }
+
+    /* Sidebar (30%) - Highlighted */
+    .browser-split .sidebar {
+      width: 180px;
+      background: #f8fafc;
+      border-left: 2px solid rgba(102, 126, 234, 0.3);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Highlight glow for sidebar */
+    .browser-split .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(102, 126, 234, 0.08) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .browser-split .sidebar-header {
+      padding: var(--space-2);
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .browser-split .sidebar-logo {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .browser-split .sidebar-logo svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .browser-split .sidebar-plus {
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .browser-split .sidebar-notes {
+      flex: 1;
+      padding: var(--space-2);
+      overflow: hidden;
+    }
+
+    .browser-split .sidebar-note {
+      background: #fff;
+      border-radius: 8px;
+      padding: var(--space-1) var(--space-2);
+      margin-bottom: var(--space-1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      border-left: 3px solid transparent;
+    }
+
+    .browser-split .sidebar-note.active {
+      border-left-color: var(--color-primary);
+      background: #f0f4ff;
+    }
+
+    .browser-split .note-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .browser-split .note-preview {
+      font-size: 8px;
+      color: #94a3b8;
+    }
+
+    /* Sidebar label badge */
+    .sidebar-label {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      color: #fff;
+      padding: 6px var(--space-2);
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      white-space: nowrap;
+    }
+
+    /* Main content label */
+    .main-label {
+      position: absolute;
+      bottom: var(--space-3);
+      left: var(--space-3);
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 6px var(--space-2);
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Language toggle */
+    .lang-switcher {
+      position: fixed;
+      top: var(--space-2);
+      right: var(--space-2);
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 4px;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-btn {
+      padding: var(--space-1) var(--space-3);
+      border-radius: 20px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .lang-btn.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    /* Language display control */
+    [lang="en"] .zh-text { display: none; }
+    [lang="zh"] .en-text { display: none; }
+
+    /* Save All Button */
+    .save-all-section {
+      position: fixed;
+      bottom: var(--space-2);
+      right: var(--space-2);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      z-index: 99;
+    }
+
+    .save-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 12px var(--space-3);
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .save-all-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .save-all-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+</head>
+<body lang="zh">
+
+  <!-- Language Switcher -->
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+
+  <!-- Save All Button -->
+  <div class="save-all-section">
+    <button class="save-all-btn" onclick="saveAllImages()">
+      <span class="icon">📦</span>
+      <span class="zh-text">保存全部图片</span>
+      <span class="en-text">Save All Images</span>
+    </button>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span class="zh-text">图片已保存！</span>
+    <span class="en-text">Image saved!</span>
+  </div>
+
+  <!-- Small Promo Tile - Chinese -->
+  <div class="tile-wrapper">
+    <div class="label">Small Promo Tile (440×280) - 中文版 V2</div>
+    <div class="tile-small zh" id="tile-small-zh" data-filename="slidenote-small-zh">
+      <div class="decoration deco-1"></div>
+      <div class="decoration deco-2"></div>
+      <div class="content">
+        <div class="logo-section">
+          <div class="logo">
+            <svg viewBox="0 0 128 128" fill="none">
+              <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+              <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+              <rect x="58" y="28" width="46" height="72" rx="6" fill="#FFFFFF"/>
+              <rect x="66" y="44" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="56" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="68" width="20" height="6" rx="3" fill="#CBD5E0"/>
+              <circle cx="40" cy="44" r="4" fill="#1A202C"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-section">
+          <div class="app-name">SlideNote</div>
+          <div class="tagline">侧边笔记，常伴左右</div>
+          <div class="features">
+            <span class="feature-tag">侧边栏</span>
+            <span class="feature-tag">云同步</span>
+            <span class="feature-tag">Markdown</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveTile('tile-small-zh')">
+      <span class="icon">💾</span>
+      <span class="zh-text">保存为 PNG</span>
+      <span class="en-text">Save as PNG</span>
+    </button>
+  </div>
+
+  <!-- Small Promo Tile - English -->
+  <div class="tile-wrapper">
+    <div class="label">Small Promo Tile (440×280) - English V2</div>
+    <div class="tile-small en" id="tile-small-en" data-filename="slidenote-small-en">
+      <div class="decoration deco-1"></div>
+      <div class="decoration deco-2"></div>
+      <div class="content">
+        <div class="logo-section">
+          <div class="logo">
+            <svg viewBox="0 0 128 128" fill="none">
+              <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+              <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+              <rect x="58" y="28" width="46" height="72" rx="6" fill="#FFFFFF"/>
+              <rect x="66" y="44" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="56" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="68" width="20" height="6" rx="3" fill="#CBD5E0"/>
+              <circle cx="40" cy="44" r="4" fill="#1A202C"/>
+            </svg>
+          </div>
+        </div>
+        <div class="text-section">
+          <div class="app-name">SlideNote</div>
+          <div class="tagline">Simple notes, always by your side</div>
+          <div class="features">
+            <span class="feature-tag">Sidebar</span>
+            <span class="feature-tag">Cloud Sync</span>
+            <span class="feature-tag">Markdown</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveTile('tile-small-en')">
+      <span class="icon">💾</span>
+      <span class="zh-text">保存为 PNG</span>
+      <span class="en-text">Save as PNG</span>
+    </button>
+  </div>
+
+  <!-- Marquee Promo Tile - Chinese -->
+  <div class="tile-wrapper">
+    <div class="label">Marquee Promo Tile (1400×560) - 中文版 V2</div>
+    <div class="tile-marquee zh" id="tile-marquee-zh" data-filename="slidenote-marquee-zh">
+      <div class="decoration deco-1"></div>
+      <div class="decoration deco-2"></div>
+      <div class="decoration deco-3"></div>
+      <div class="content">
+        <div class="left-section">
+          <div class="logo-large">
+            <svg viewBox="0 0 128 128" fill="none">
+              <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+              <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+              <rect x="58" y="28" width="46" height="72" rx="6" fill="#FFFFFF"/>
+              <rect x="66" y="44" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="56" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="68" width="20" height="6" rx="3" fill="#CBD5E0"/>
+              <circle cx="40" cy="44" r="4" fill="#1A202C"/>
+            </svg>
+          </div>
+          <div class="app-name-large">SlideNote</div>
+          <div class="tagline-large">侧边笔记，常伴左右</div>
+          <div class="tagline-sub zh-text">住在浏览器侧边的便利贴</div>
+          <div class="tagline-sub en-text">A sticky note in your browser sidebar</div>
+          <div class="divider"></div>
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">📍</div>
+              <div>
+                <div class="feature-text">侧边栏，不遮挡</div>
+                <span class="feature-sub">固定在浏览器侧边</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <div>
+                <div class="feature-text">秒开即用</div>
+                <span class="feature-sub">&lt; 100ms 加载</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">☁️</div>
+              <div>
+                <div class="feature-text">跨设备同步</div>
+                <span class="feature-sub">Chrome 自动同步</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📝</div>
+              <div>
+                <div class="feature-text">支持 Markdown</div>
+                <span class="feature-sub">密钥、命令更清晰</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right-section">
+          <div class="browser-split">
+            <div class="browser-header">
+              <div class="browser-dots">
+                <div class="browser-dot red"></div>
+                <div class="browser-dot yellow"></div>
+                <div class="browser-dot green"></div>
+              </div>
+              <div class="browser-url">github.com/maoruibin/SlideNote</div>
+            </div>
+            <div class="browser-body">
+              <div class="main-content">
+                <div class="content-placeholder">
+                  <div class="content-hero"></div>
+                  <div class="content-skeleton">
+                    <div class="skeleton-box"></div>
+                    <div class="skeleton-box"></div>
+                    <div class="skeleton-box"></div>
+                  </div>
+                  <div class="content-lines">
+                    <div class="content-line"></div>
+                    <div class="content-line"></div>
+                    <div class="content-line"></div>
+                  </div>
+                </div>
+                <div class="main-label zh-text">网页内容完全可见</div>
+                <div class="main-label en-text">Content fully visible</div>
+              </div>
+              <div class="sidebar">
+                <div class="sidebar-label zh-text">SlideNote</div>
+                <div class="sidebar-label en-text">SlideNote</div>
+                <div class="sidebar-header">
+                  <div class="sidebar-logo">
+                    <svg viewBox="0 0 128 128" fill="none">
+                      <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+                      <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+                    </svg>
+                  </div>
+                  <div class="sidebar-plus">+</div>
+                </div>
+                <div class="sidebar-notes">
+                  <div class="sidebar-note">
+                    <div class="note-title">常用命令</div>
+                    <div class="note-preview">lsof, grep...</div>
+                  </div>
+                  <div class="sidebar-note active">
+                    <div class="note-title">服务器配置</div>
+                    <div class="note-preview">47.xxx.xxx.xxx</div>
+                  </div>
+                  <div class="sidebar-note">
+                    <div class="note-title">API Keys</div>
+                    <div class="note-preview">sk-xxxxx...</div>
+                  </div>
+                  <div class="sidebar-note">
+                    <div class="note-title">AI 提示词</div>
+                    <div class="note-preview">你是一个...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveTile('tile-marquee-zh')">
+      <span class="icon">💾</span>
+      <span class="zh-text">保存为 PNG</span>
+      <span class="en-text">Save as PNG</span>
+    </button>
+  </div>
+
+  <!-- Marquee Promo Tile - English -->
+  <div class="tile-wrapper">
+    <div class="label">Marquee Promo Tile (1400×560) - English V2</div>
+    <div class="tile-marquee en" id="tile-marquee-en" data-filename="slidenote-marquee-en">
+      <div class="decoration deco-1"></div>
+      <div class="decoration deco-2"></div>
+      <div class="decoration deco-3"></div>
+      <div class="content">
+        <div class="left-section">
+          <div class="logo-large">
+            <svg viewBox="0 0 128 128" fill="none">
+              <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+              <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+              <rect x="58" y="28" width="46" height="72" rx="6" fill="#FFFFFF"/>
+              <rect x="66" y="44" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="56" width="30" height="6" rx="3" fill="#CBD5E0"/>
+              <rect x="66" y="68" width="20" height="6" rx="3" fill="#CBD5E0"/>
+              <circle cx="40" cy="44" r="4" fill="#1A202C"/>
+            </svg>
+          </div>
+          <div class="app-name-large">SlideNote</div>
+          <div class="tagline-large">Simple notes, always by your side</div>
+          <div class="tagline-sub zh-text">住在浏览器侧边的便利贴</div>
+          <div class="tagline-sub en-text">A sticky note in your browser sidebar</div>
+          <div class="divider"></div>
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">📍</div>
+              <div>
+                <div class="feature-text">Never blocks content</div>
+                <span class="feature-sub">Fixed in browser sidebar</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">⚡</div>
+              <div>
+                <div class="feature-text">Instant access</div>
+                <span class="feature-sub">Loads in &lt; 100ms</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">☁️</div>
+              <div>
+                <div class="feature-text">Cross-device sync</div>
+                <span class="feature-sub">Auto sync via Chrome</span>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">📝</div>
+              <div>
+                <div class="feature-text">Markdown support</div>
+                <span class="feature-sub">Keys, commands formatted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right-section">
+          <div class="browser-split">
+            <div class="browser-header">
+              <div class="browser-dots">
+                <div class="browser-dot red"></div>
+                <div class="browser-dot yellow"></div>
+                <div class="browser-dot green"></div>
+              </div>
+              <div class="browser-url">github.com/maoruibin/SlideNote</div>
+            </div>
+            <div class="browser-body">
+              <div class="main-content">
+                <div class="content-placeholder">
+                  <div class="content-hero"></div>
+                  <div class="content-skeleton">
+                    <div class="skeleton-box"></div>
+                    <div class="skeleton-box"></div>
+                    <div class="skeleton-box"></div>
+                  </div>
+                  <div class="content-lines">
+                    <div class="content-line"></div>
+                    <div class="content-line"></div>
+                    <div class="content-line"></div>
+                  </div>
+                </div>
+                <div class="main-label zh-text">网页内容完全可见</div>
+                <div class="main-label en-text">Content fully visible</div>
+              </div>
+              <div class="sidebar">
+                <div class="sidebar-label zh-text">SlideNote</div>
+                <div class="sidebar-label en-text">SlideNote</div>
+                <div class="sidebar-header">
+                  <div class="sidebar-logo">
+                    <svg viewBox="0 0 128 128" fill="none">
+                      <rect x="8" y="8" width="112" height="112" rx="24" fill="#E2E8F0"/>
+                      <rect x="28" y="28" width="24" height="72" rx="6" fill="#2D3748"/>
+                    </svg>
+                  </div>
+                  <div class="sidebar-plus">+</div>
+                </div>
+                <div class="sidebar-notes">
+                  <div class="sidebar-note">
+                    <div class="note-title">Commands</div>
+                    <div class="note-preview">lsof, grep...</div>
+                  </div>
+                  <div class="sidebar-note active">
+                    <div class="note-title">Server Config</div>
+                    <div class="note-preview">47.xxx.xxx.xxx</div>
+                  </div>
+                  <div class="sidebar-note">
+                    <div class="note-title">API Keys</div>
+                    <div class="note-preview">sk-xxxxx...</div>
+                  </div>
+                  <div class="sidebar-note">
+                    <div class="note-title">AI Prompts</div>
+                    <div class="note-preview">You are a...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveTile('tile-marquee-en')">
+      <span class="icon">💾</span>
+      <span class="zh-text">保存为 PNG</span>
+      <span class="en-text">Save as PNG</span>
+    </button>
+  </div>
+
+  <script>
+    // Language switcher
+    function setLang(lang) {
+      document.body.setAttribute('lang', lang);
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(lang === 'zh' ? '中文' : 'EN'));
+      });
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (message) {
+        toast.innerHTML = message;
+      }
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    // Save single tile as PNG
+    async function saveTile(tileId) {
+      const tile = document.getElementById(tileId);
+      const btn = tile.parentElement.querySelector('.save-btn');
+      const filename = tile.dataset.filename || 'slidenote-tile';
+
+      // Disable button and show loading
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div>';
+
+      try {
+        // Use html2canvas with 2x scale for high resolution
+        const canvas = await html2canvas(tile, {
+          scale: 2,
+          backgroundColor: null,
+          logging: false,
+          useCORS: true
+        });
+
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `${filename}.png`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+
+          // Reset button and show toast
+          btn.disabled = false;
+          btn.innerHTML = '<span class="icon">💾</span><span class="zh-text">保存为 PNG</span><span class="en-text">Save as PNG</span>';
+          showToast();
+        }, 'image/png');
+
+      } catch (error) {
+        console.error('Error saving image:', error);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="icon">💾</span><span class="zh-text">保存为 PNG</span><span class="en-text">Save as PNG</span>';
+      }
+    }
+
+    // Save all images
+    async function saveAllImages() {
+      const tiles = ['tile-small-zh', 'tile-small-en', 'tile-marquee-zh', 'tile-marquee-en'];
+      const btn = document.querySelector('.save-all-btn');
+      const currentLang = document.body.getAttribute('lang');
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div>';
+
+      for (let i = 0; i < tiles.length; i++) {
+        await saveTile(tiles[i]);
+        // Small delay between saves
+        if (i < tiles.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span class="icon">📦</span><span class="zh-text">保存全部图片</span><span class="en-text">Save All Images</span>';
+
+      // Show completion toast
+      const lang = document.body.getAttribute('lang');
+      const message = lang === 'zh'
+        ? '✅ 全部保存完成！共 4 张图片'
+        : '✅ All saved! 4 images total';
+      showToast(message);
+    }
+  </script>
+</body>
+</html>

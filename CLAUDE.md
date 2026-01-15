@@ -2,11 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **Simple notes, always by your side**
+> **侧边笔记，常伴左右**
+
 ## Project Overview
 
-SlideNote is a Chrome sidebar extension for quick, cross-device note-taking. It uses Chrome Storage Sync API for automatic synchronization across devices. The project philosophy is "simplicity above all" - focusing solely on storing and syncing short text fragments.
+SlideNote is a Chrome sidebar extension for quickly storing and accessing fragments of information. It uses the Chrome Side Panel API to live in the browser sidebar **without blocking page content**. Data syncs automatically across devices via Chrome Storage Sync API.
 
-**Current Status**: Design phase (v0.0.1). Implementation is pending.
+**Product Positioning**: SlideNote is **not a note-taking app**. Think of it as a "sticky note in your browser sidebar" or a "cloud clipboard for fragments" — for quickly storing and retrieving small pieces of information (API keys, server addresses, commands, prompts, etc.).
+
+**Core Value** (in order of importance):
+1. **Sidebar, never blocks content** — This is the unique selling point
+2. **Instant access** — Opens in < 100ms, no app switching
+3. **Auto-sync across devices** — Your fragments follow you everywhere
+4. **Real-time search** — Find anything instantly
+5. **Markdown support** — Basic formatting for keys, commands, and code (v0.0.3)
+
+**Current Status**: v0.0.3 released with Markdown support.
 
 ## Development Commands
 
@@ -189,8 +201,21 @@ Two types handled:
 ## Principles to Follow
 
 1. **No Framework**: Stick to vanilla ES6+ JavaScript
-2. **Minimal Dependencies**: Only Vite for building, TypeScript for type checking
+2. **Minimal Dependencies**: Only Vite for building, TypeScript for type checking, marked.js for Markdown (~7KB)
 3. **CSS Variables**: Use the defined design tokens, avoid hardcoding values
 4. **Component Pattern**: Extend `Component` base class for consistent lifecycle
 5. **Event-Driven**: Use EventBus, not direct component references
 6. **Storage Awareness**: Respect Chrome Storage limits, implement warnings at 90% capacity
+7. **Product Positioning**: Remember this is NOT a note-taking app — it's for fragments, not articles
+
+## Key Product Phrases to Use
+
+When writing documentation, marketing, or code comments:
+
+| Use | Avoid |
+|-----|-------|
+| "便利贴" (sticky note) | "笔记本" (notebook) |
+| "碎片信息" (fragments) | "笔记" (notes) |
+| "快速存取" (quick access) | "写作" (writing) |
+| "不遮挡内容" (never blocks content) | "悬浮窗口" (floating window) |
+| "云剪贴板" (cloud clipboard) | "知识库" (knowledge base) |

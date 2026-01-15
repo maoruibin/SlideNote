@@ -988,7 +988,7 @@ button {
   font-size: var(--font-size-sm);
   line-height: 1.7;
   word-wrap: break-word;
-  cursor: text;
+  cursor: pointer;
   padding: 4px 0;
 }
 
