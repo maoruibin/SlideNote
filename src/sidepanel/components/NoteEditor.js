@@ -1,6 +1,6 @@
 /**
  * NoteEditor - 笔记编辑器组件
- * 支持 Markdown 渲染，默认预览模式
+ * 支持 Markdown 渲染，全局模式，默认编辑模式
  */
 
 import { formatRelativeTime } from '../utils/format.js';
@@ -9,34 +9,27 @@ import { render } from '../utils/marked.js';
 import { EditorMoreMenu } from './EditorMoreMenu.js';
 import { SyntaxHelpModal } from './SyntaxHelpModal.js';
 
-// 存储键名
-const STORAGE_KEY = 'noteViewMode';
+// 存储键名（全局模式）
+const STORAGE_KEY = 'globalViewMode';
 
 /**
- * 获取笔记的显示模式
- * @param {string} noteId
+ * 获取全局显示模式
  * @returns {Promise<string>} 'preview' | 'edit'
  */
-async function getNoteMode(noteId) {
+async function getGlobalMode() {
   return new Promise((resolve) => {
     chrome.storage.local.get([STORAGE_KEY], (result) => {
-      const modes = result[STORAGE_KEY] || {};
-      resolve(modes[noteId] || 'preview');
+      resolve(result[STORAGE_KEY] || 'edit');
     });
   });
 }
 
 /**
- * 保存笔记的显示模式
- * @param {string} noteId
+ * 保存全局显示模式
  * @param {string} mode 'preview' | 'edit'
  */
-function saveNoteMode(noteId, mode) {
-  chrome.storage.local.get([STORAGE_KEY], (result) => {
-    const modes = result[STORAGE_KEY] || {};
-    modes[noteId] = mode;
-    chrome.storage.local.set({ [STORAGE_KEY]: modes });
-  });
+function saveGlobalMode(mode) {
+  chrome.storage.local.set({ [STORAGE_KEY]: mode });
 }
 
 export class NoteEditor {
@@ -56,7 +49,7 @@ export class NoteEditor {
     this._moreMenu = null;
     this._syntaxHelpModal = null;
     this._moreBtn = null;
-    this._previewMode = true;     // 默认预览模式
+    this._previewMode = false;    // 默认编辑模式
     this._previewLayer = null;
     this._modeToggleBtn = null;   // 模式切换按钮引用
 
@@ -323,10 +316,8 @@ export class NoteEditor {
     // 聚焦编辑器
     this._textarea.focus();
 
-    // 保存状态
-    if (this.state.note?.id) {
-      saveNoteMode(this.state.note.id, 'edit');
-    }
+    // 保存全局状态
+    saveGlobalMode('edit');
   }
 
   /**
@@ -348,10 +339,8 @@ export class NoteEditor {
     this._modeToggleBtn.innerHTML = this._getEditIcon();
     this._modeToggleBtn.setAttribute('aria-label', t('editNote'));
 
-    // 保存状态
-    if (this.state.note?.id) {
-      saveNoteMode(this.state.note.id, 'preview');
-    }
+    // 保存全局状态
+    saveGlobalMode('preview');
   }
 
   /**
@@ -486,13 +475,9 @@ export class NoteEditor {
       const note = this.props.store?.state.notes.find(n => n.id === id);
       this.setState({ note: note || null });
 
-      // 新建笔记强制编辑模式，否则恢复保存的状态
-      if (this._isNewNote) {
-        this._previewMode = false;
-      } else {
-        const savedMode = await getNoteMode(id);
-        this._previewMode = (savedMode === 'edit') ? false : true;
-      }
+      // 使用全局模式，切换笔记不打断用户
+      const globalMode = await getGlobalMode();
+      this._previewMode = (globalMode === 'edit') ? false : true;
 
       this._updateContainer();
 
@@ -505,17 +490,6 @@ export class NoteEditor {
 
       if (this._isNewNote) {
         this._focusTitleInput();
-        // 直接设置编辑模式（不通过 _setEditMode，避免引用检查失败）
-        if (this._textarea) {
-          this._textarea.style.display = 'block';
-        }
-        if (this._previewLayer) {
-          this._previewLayer.style.display = 'none';
-        }
-        if (this._modeToggleBtn) {
-          this._modeToggleBtn.innerHTML = this._getPreviewIcon();
-          this._modeToggleBtn.setAttribute('aria-label', t('previewNote'));
-        }
       }
     });
     if (unsubscribeSelect) this._cleanup.push(unsubscribeSelect);
@@ -622,15 +596,18 @@ export class NoteEditor {
    * @private
    */
   _focusTitleInput() {
-    setTimeout(() => {
-      const input = /** @type {HTMLInputElement} */ (this._titleInput);
-      if (input) {
-        input.focus();
-        if (input.value) {
-          input.select();
+    // 双重 requestAnimationFrame 确保 DOM 完全渲染
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const input = /** @type {HTMLInputElement} */ (this._titleInput);
+        if (input) {
+          input.focus();
+          if (input.value) {
+            input.select();
+          }
         }
-      }
-    }, 50);
+      });
+    });
   }
 
   /**

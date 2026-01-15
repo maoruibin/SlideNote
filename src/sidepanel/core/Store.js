@@ -103,15 +103,16 @@ export class Store extends EventEmitter {
    * @returns {Promise<Object>} 返回笔记对象，包含 isNew 标记
    */
   async createNote() {
-    // 计算新的 order 值（最小值 - 1，放在最前面）
-    const minOrder = Math.min(...this.state.notes.map(n => n.order ?? 0), 0);
+    // 新笔记放在最顶部（order 值最大）
+    const maxOrder = Math.max(...this.state.notes.map(n => n.order ?? 0), 0);
+
     const note = {
       id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       title: '',  // 新建笔记时标题为空
       content: '',
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      order: minOrder - 1,
+      order: maxOrder + 1,  // 最大值 + 1，排在最前面
     };
 
     this.state.notes.unshift(note);

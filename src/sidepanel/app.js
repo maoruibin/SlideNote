@@ -156,7 +156,7 @@ class App {
       // 侧边栏折叠时自动展开
       await this.expandSidebar();
       const result = await this.store.createNote();
-      bus.emit('note:select', result.id);
+      bus.emit('note:select', result.id, { isNew: true });
       // 延迟触发编辑模式（等待渲染完成）
       setTimeout(() => {
         bus.emit('editor:set-edit-mode');
