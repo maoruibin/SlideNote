@@ -100,6 +100,27 @@ npm run build:prod
 
 ---
 
+## ❓ FAQ
+
+### Where are notes stored? Is it secure?
+
+SlideNote uses **Chrome Storage API** to store data:
+
+- ✅ No third-party servers; data syncs directly between your local and Google
+- ✅ Open source, code is transparent
+- ✅ No personal information collected
+
+### Is there a sync limit?
+
+Chrome Storage Sync API has these limits:
+
+- Total capacity ~100KB (about 50,000 Chinese characters)
+- Suitable for: API Keys, commands, prompts, and similar fragmented information
+
+SlideNote is a "sticky note", not a "notebook". For storing large amounts of content, consider using dedicated note apps like Notion or Obsidian.
+
+---
+
 ## 🛠️ Tech Stack
 
 ```
