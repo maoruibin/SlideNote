@@ -15,10 +15,28 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.5-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.6-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-在线安装-green"></a>
 </p>
+
+---
+
+## 🆕 最新版本 v0.0.6
+
+### 新增功能
+- 🌙 **夜间模式** — 自动跟随系统深色模式，护眼又舒适
+
+### Bug 修复
+- 🐛 修复删除笔记后编辑器内容不更新的问题
+- 🎨 修复暗色模式下社交图标颜色不适配的问题
+
+### 体验优化
+- 🎨 **Toolbar 重新设计** — 搜索/返回无边框，新建按钮占满中间
+- 🎨 统一按钮图标尺寸，视觉更协调
+- 🎨 左右间距对称，布局更平衡
+
+📜 **查看完整更新日志** → [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
