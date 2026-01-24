@@ -190,5 +190,115 @@
   "viewSource": {
     "message": "View Source",
     "description": "View source link tooltip"
+  },
+  "more": {
+    "message": "More",
+    "description": "More menu"
+  },
+  "exportNotes": {
+    "message": "Export Notes",
+    "description": "Export notes button"
+  },
+  "importBackup": {
+    "message": "Import Backup",
+    "description": "Import backup button"
+  },
+  "export": {
+    "message": "Export",
+    "description": "Export button"
+  },
+  "formatJSONDesc": {
+    "message": "Full backup with metadata",
+    "description": "JSON format description"
+  },
+  "formatMDDesc": {
+    "message": "Readable, suitable for viewing",
+    "description": "Markdown format description"
+  },
+  "selectFile": {
+    "message": "Select backup file",
+    "description": "Select file button"
+  },
+  "importTip": {
+    "message": "Please export current backup before importing",
+    "description": "Import tip"
+  },
+  "importSuccess": {
+    "message": "Imported $1$ notes",
+    "description": "Import success message",
+    "placeholders": {
+      "1": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "noNewNotesToImport": {
+    "message": "No new notes to import",
+    "description": "No new notes message"
+  },
+  "importFailed": {
+    "message": "Import failed",
+    "description": "Import failed message"
+  },
+  "noNotesToExport": {
+    "message": "No notes to export",
+    "description": "No notes export message"
+  },
+  "exportSuccess": {
+    "message": "Export successful",
+    "description": "Export success message"
+  },
+  "exportFailed": {
+    "message": "Export failed",
+    "description": "Export failed message"
+  },
+  "invalidFileType": {
+    "message": "Please select a JSON format backup file",
+    "description": "Invalid file type"
+  },
+  "invalidBackupFormat": {
+    "message": "Invalid backup file format",
+    "description": "Invalid backup format"
+  },
+  "aboutTitle": {
+    "message": "About SlideNote",
+    "description": "About dialog title"
+  },
+  "socialLinks": {
+    "message": "Social Links",
+    "description": "Social links title"
+  },
+  "changelog": {
+    "message": "View Changelog",
+    "description": "Changelog link"
+  },
+  "close": {
+    "message": "Close",
+    "description": "Close button"
+  },
+  "exportedAt": {
+    "message": "Exported at",
+    "description": "Export time label"
+  },
+  "noteCount": {
+    "message": "Note count",
+    "description": "Note count label"
+  },
+  "about": {
+    "message": "About",
+    "description": "About button"
+  },
+  "expandSidebar": {
+    "message": "Expand sidebar",
+    "description": "Expand sidebar button"
+  },
+  "pin": {
+    "message": "Pin",
+    "description": "Pin note"
+  },
+  "unpin": {
+    "message": "Unpin",
+    "description": "Unpin note"
   }
 }

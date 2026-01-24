@@ -39,16 +39,26 @@ export class NoteList {
     const container = document.createElement('div');
     container.className = 'note-list';
 
+    // 使用排序后的笔记（置顶在前）
+    const notes = this.props.store ? this.props.store.getSortedNotes() : this.state.notes;
+
     // 空状态
-    if (this.state.notes.length === 0) {
+    if (notes.length === 0) {
       container.innerHTML = this._renderEmpty();
       return container;
     }
 
     // 渲染列表项
-    this.state.notes.forEach(note => {
+    notes.forEach((note, index) => {
       const item = this._renderItem(note);
       container.appendChild(item);
+
+      // 在最后一个置顶笔记后插入分隔线
+      if (note.pinned && (index === notes.length - 1 || !notes[index + 1]?.pinned)) {
+        const divider = document.createElement('div');
+        divider.className = 'pinned-divider';
+        container.appendChild(divider);
+      }
     });
 
     return container;
@@ -64,10 +74,11 @@ export class NoteList {
    */
   _renderItem(note) {
     const isActive = note.id === this.state.activeId;
+    const isPinned = note.pinned || false;
     const index = this.state.notes.findIndex(n => n.id === note.id);
 
     const item = document.createElement('div');
-    item.className = `note-item${isActive ? ' active' : ''}`;
+    item.className = `note-item${isPinned ? ' pinned' : ''}${isActive ? ' active' : ''}`;
     item.dataset.id = note.id;
 
     // 标题
@@ -192,6 +203,7 @@ export class NoteList {
       y: e.clientY,
       index,
       total: this.state.notes.length,
+      note: note,
       onSelect: (action) => this._handleMenuAction(action, note),
     });
   }
@@ -216,6 +228,9 @@ export class NoteList {
         break;
       case 'move-bottom':
         await store.moveNoteToBottom(note.id);
+        break;
+      case 'pin':
+        await store.togglePin(note.id);
         break;
       case 'delete':
         this.props.bus?.emit('note:delete-request', note);

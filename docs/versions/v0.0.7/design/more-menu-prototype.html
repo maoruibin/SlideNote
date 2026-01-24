@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideNote - More Menu & About 原型设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .prototype-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .prototype {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .prototype-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fafafa;
+        }
+
+        .search-box {
+            flex: 1;
+            height: 32px;
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .btn-new {
+            height: 32px;
+            padding: 0 14px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* 笔记列表 */
+        .note-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .note-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background 0.15s;
+        }
+
+        .note-item:hover {
+            background: #f9fafb;
+        }
+
+        .note-item.active {
+            background: #eff6ff;
+            border-left-color: #3b82f6;
+        }
+
+        .note-item.pinned .note-title::before {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f59e0b'%3E%3Cpath d='M16 12V4H17V2H7V4H8V12L6 14V16H11.2V22H12.8V16H18V14L16 12Z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        .note-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .note-preview {
+            font-size: 12px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pinned-divider {
+            border-top: 1px solid #e5e7eb;
+            margin: 8px 0;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 10px 12px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .footer-feedback {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .footer-feedback:hover {
+            color: #3b82f6;
+        }
+
+        .footer-more {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #6b7280;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .footer-more:hover {
+            background: #e5e7eb;
+        }
+
+        .footer-more.active {
+            background: #e5e7eb;
+        }
+
+        .more-dots {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .more-dots span {
+            width: 3px;
+            height: 3px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        /* More 菜单 */
+        .more-menu {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 4px;
+            width: 180px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.2s ease;
+        }
+
+        .more-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .more-menu-item {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .more-menu-item:hover {
+            background: #f3f4f6;
+        }
+
+        .more-menu-item svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .more-menu-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 4px 0;
+        }
+
+        .menu-arrow {
+            position: absolute;
+            bottom: -6px;
+            right: 16px;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-left: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            transform: rotate(45deg);
+        }
+
+        /* 关于弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 380px;
+            max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .about-logo {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .about-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .about-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .about-tagline {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .about-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .about-info {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .about-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+            color: #6b7280;
+        }
+
+        .social-link:hover {
+            background: #f9fafb;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .social-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .about-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .about-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #374151;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .about-link:hover {
+            background: #f9fafb;
+            border-color: #3b82f6;
+        }
+
+        .about-link svg {
+            width: 16px;
+            height: 16px;
+            color: #6b7280;
+        }
+
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-close {
+            padding: 8px 20px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-close:hover {
+            background: #2563eb;
+        }
+
+        /* 隐藏滚动条 */
+        .note-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .note-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .note-list::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SlideNote - More Menu & About 原型设计</h1>
+
+    <div class="prototype-container">
+
+        <!-- 状态 1: 默认状态 -->
+        <div class="prototype">
+            <div class="prototype-title">默认状态</div>
+            <div class="sidebar">
+                <div class="toolbar">
+                    <div class="search-box">🔍 搜索笔记...</div>
+                    <button class="btn-new">+ 新建</button>
+                </div>
+                <div class="note-list">
+                    <div class="note-item pinned active">
+                        <div class="note-title">AI 提示词</div>
+                        <div class="note-preview">用于 DeepSeek 写作的提示词模板...</div>
+                    </div>
+                    <div class="note-item pinned">
+                        <div class="note-title">常用命令</div>
+                        <div class="note-preview">Git 常用命令备忘...</div>
+                    </div>
+                    <div class="pinned-divider"></div>
+                    <div class="note-item">
+                        <div class="note-title">服务器地址</div>
+                        <div class="note-preview">生产环境: 192.168.1.100...</div>
+                    </div>
+                    <div class="note-item">
+                        <div class="note-title">项目待办</div>
+                        <div class="note-preview">1. 完成登录页面...</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <a href="#" class="footer-feedback">
+                        <span>💬</span>
+                        <span>意见反馈</span>
+                    </a>
+                    <div class="footer-more" onclick="toggleMenu(this)">
+                        <span>更多</span>
+                        <div class="more-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态 2: 菜单展开 -->
+        <div class="prototype" style="position: relative;">
+            <div class="prototype-title">菜单展开</div>
+            <div class="sidebar">
+                <div class="toolbar">
+                    <div class="search-box">🔍 搜索笔记...</div>
+                    <button class="btn-new">+ 新建</button>
+                </div>
+                <div class="note-list">
+                    <div class="note-item pinned active">
+                        <div class="note-title">AI 提示词</div>
+                        <div class="note-preview">用于 DeepSeek 写作的提示词模板...</div>
+                    </div>
+                    <div class="note-item pinned">
+                        <div class="note-title">常用命令</div>
+                        <div class="note-preview">Git 常用命令备忘...</div>
+                    </div>
+                    <div class="pinned-divider"></div>
+                    <div class="note-item">
+                        <div class="note-title">服务器地址</div>
+                        <div class="note-preview">生产环境: 192.168.1.100...</div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <a href="#" class="footer-feedback">
+                        <span>💬</span>
+                        <span>意见反馈</span>
+                    </a>
+                    <div class="footer-more active">
+                        <span>更多</span>
+                        <div class="more-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="more-menu show">
+                            <div class="menu-arrow"></div>
+                            <div class="more-menu-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                                </svg>
+                                <span>导出笔记</span>
+                            </div>
+                            <div class="more-menu-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                                </svg>
+                                <span>导入备份</span>
+                            </div>
+                            <div class="more-menu-divider"></div>
+                            <div class="more-menu-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                                </svg>
+                                <span>GitHub 源码</span>
+                            </div>
+                            <div class="more-menu-item" onclick="openAbout()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
+                                <span>关于</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 关于弹窗 -->
+    <div class="modal-overlay" id="aboutModal" onclick="closeAboutOutside(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">关于 SlideNote</div>
+                <button class="modal-close" onclick="closeAbout()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="about-logo">
+                    <div class="about-icon">📝</div>
+                    <div class="about-name">SlideNote</div>
+                    <div class="about-tagline">侧边笔记，常伴左右</div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-info">
+                        <div class="about-info-item">
+                            <span>📦</span>
+                            <span>v0.0.7</span>
+                        </div>
+                        <div class="about-info-item">
+                            <span>👨‍💻</span>
+                            <span>咕咚同学</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="section-title">社交链接</div>
+                    <div class="social-links">
+                        <a href="https://github.com/maoruibin/SlideNote" class="social-link" title="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                            </svg>
+                        </a>
+                        <a href="https://x.com/dxgudong" class="social-link" title="X (Twitter)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="即刻">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">📱</text>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="小红书">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">📕</text>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="微信">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">💬</text>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="section-title">更多</div>
+                    <div class="about-links">
+                        <a href="#" class="about-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                            </svg>
+                            <span>导出笔记备份</span>
+                        </a>
+                        <a href="https://my.feishu.cn/share/base/form/shrcnnfhgGcaqzU3lUfrDxamVZc" class="about-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                            </svg>
+                            <span>意见反馈</span>
+                        </a>
+                        <a href="#" class="about-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <span>查看更新日志</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="closeAbout()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu(el) {
+            el.classList.toggle('active');
+        }
+
+        function openAbout() {
+            document.getElementById('aboutModal').classList.add('show');
+        }
+
+        function closeAbout() {
+            document.getElementById('aboutModal').classList.remove('show');
+        }
+
+        function closeAboutOutside(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeAbout();
+            }
+        }
+    </script>
+</body>
+</html>

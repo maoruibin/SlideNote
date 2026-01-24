@@ -1,0 +1,20 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "push": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "before:init": "npm run release:check",
+    "after:bump": "npm run version:sync",
+    "after:release": "npm run archive"
+  },
+  "github": {
+    "release": false,
+    "releaseName": "v${version}",
+    "tokenRef": "GITHUB_TOKEN"
+  }
+}

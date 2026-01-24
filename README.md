@@ -181,6 +181,24 @@ slidenote/
 统一的圆角    → 温和不尖锐
 ```
 
+### UI 设计规范
+
+所有功能设计遵循统一的 **[UI 设计规范](docs/versions/v0.0.7/design/UI-Design-System.md)**，确保产品一致性。
+
+| 规范 | 说明 |
+|------|------|
+| 📄 [设计规范文档](docs/versions/v0.0.7/design/UI-Design-System.md) | 颜色、字体、间距、组件完整定义 |
+| 🎨 [组件可视化展示](docs/versions/v0.0.7/design/UI-Components-Showcase.html) | 所有 UI 组件的效果预览 |
+
+**核心设计要素**：
+
+```css
+主色:     #3b82f6  (蓝色)
+字体:     11-16px  渐进式字号
+间距:     4/8/12/16px 标准
+圆角:     4/6/8/12px 渐进式
+```
+
 ---
 
 ## 📮 关注作者

@@ -1,0 +1,85 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-build:
+    name: Verify Release Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build production
+        run: npm run build:prod
+
+      - name: Verify manifest
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          MANIFEST_VERSION=$(jq -r '.version' dist/manifest.json)
+          if [ "$VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "Version mismatch: tag=$VERSION, manifest=$MANIFEST_VERSION"
+            exit 1
+          fi
+          echo "✓ Version verified: $VERSION"
+
+      - name: Create package
+        run: npm run package
+
+      - name: Verify package
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          PACKAGE="SlideNote-v${VERSION}.zip"
+          if [ ! -f "$PACKAGE" ]; then
+            echo "Package not found: $PACKAGE"
+            exit 1
+          fi
+          echo "✓ Package created: $PACKAGE"
+          ls -lh "$PACKAGE"
+
+  note:
+    name: Release Automation
+    runs-on: ubuntu-latest
+    needs: verify-build
+
+    steps:
+      - name: 📝 Release Instructions
+        run: |
+          echo "================================"
+          echo "Build verified successfully!"
+          echo "================================"
+          echo ""
+          echo "Next steps to complete the release:"
+          echo ""
+          echo "1. Create GitHub Release:"
+          echo "   gh release create ${GITHUB_REF#refs/tags/} \\"
+          echo "     --title \"${GITHUB_REF#refs/tags/}\" \\"
+          echo "     --notes-file - < CHANGELOG.md"
+          echo ""
+          echo "2. Upload to Chrome Web Store:"
+          echo "   - Download the package artifact"
+          echo "   - Upload to Chrome Web Store Dev Console"
+          echo "   - Submit for review"
+          echo ""
+          echo "3. Generate promotional content:"
+          echo "   Run: /generate-post"
+          echo ""

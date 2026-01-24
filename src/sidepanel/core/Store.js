@@ -100,19 +100,24 @@ export class Store extends EventEmitter {
 
   /**
    * 创建新笔记
+   * @param {Object} options - 可选的笔记数据（用于导入）
+   * @param {string} options.id - 指定笔记 ID
+   * @param {string} options.title - 笔记标题
+   * @param {string} options.content - 笔记内容
+   * @param {number} options.createdAt - 创建时间
+   * @param {number} options.updatedAt - 更新时间
+   * @param {number} options.order - 排序值
    * @returns {Promise<Object>} 返回笔记对象，包含 isNew 标记
    */
-  async createNote() {
-    // 新笔记放在最顶部（order 值最大）
-    const maxOrder = Math.max(...this.state.notes.map(n => n.order ?? 0), 0);
-
+  async createNote(options = {}) {
     const note = {
-      id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      title: '',  // 新建笔记时标题为空
-      content: '',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      order: maxOrder + 1,  // 最大值 + 1，排在最前面
+      id: options.id || `note_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      title: options.title !== undefined ? options.title : '',
+      content: options.content !== undefined ? options.content : '',
+      createdAt: options.createdAt || Date.now(),
+      updatedAt: options.updatedAt || Date.now(),
+      // 如果指定了 order 就用指定的，否则放在最顶部
+      order: options.order !== undefined ? options.order : (Math.max(...this.state.notes.map(n => n.order ?? 0), 0) + 1),
     };
 
     this.state.notes.unshift(note);
@@ -124,6 +129,29 @@ export class Store extends EventEmitter {
 
     // 返回笔记对象 + isNew 标记（用于 UI 聚焦处理）
     return { ...note, isNew: true };
+  }
+
+  /**
+   * 批量导入笔记（不触发逐个事件，用于导入功能）
+   * @param {Array} notes - 要导入的笔记数组
+   * @returns {Promise<number>} 导入的笔记数量
+   */
+  async importNotes(notes) {
+    for (const note of notes) {
+      // 直接添加到数组，不触发单个笔记的事件
+      this.state.notes.unshift(note);
+    }
+
+    // 按排序值重新排序
+    this._sortNotes();
+
+    // 一次性持久化
+    await this._persist();
+
+    // 触发一次全局变化事件
+    this.emit('change');
+
+    return notes.length;
   }
 
   /**
@@ -226,6 +254,39 @@ export class Store extends EventEmitter {
     await this._persist();
     this.emit('change');
     this.emit('note-reordered', this.state.notes);
+  }
+
+  /**
+   * 切换笔记置顶状态
+   * @param {string} id - 笔记ID
+   */
+  async togglePin(id) {
+    const note = this.state.notes.find(n => n.id === id);
+    if (!note) return;
+
+    // 切换置顶状态
+    note.pinned = !note.pinned;
+    note.updatedAt = Date.now();
+
+    // 持久化并通知
+    await this._persist();
+    this.emit('change');
+    this.emit('note-updated', note);
+  }
+
+  /**
+   * 获取排序后的笔记（置顶在前）
+   * @returns {Array} 排序后的笔记数组
+   */
+  getSortedNotes() {
+    const pinned = this.state.notes.filter(n => n.pinned);
+    const unpinned = this.state.notes.filter(n => !n.pinned);
+
+    // 各自按 order 降序排序（大的在前）
+    pinned.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+    unpinned.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
+
+    return [...pinned, ...unpinned];
   }
 
   /**

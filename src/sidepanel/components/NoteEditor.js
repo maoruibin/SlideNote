@@ -365,7 +365,7 @@ export class NoteEditor {
    * @private
    */
   _navigateToPrev() {
-    const notes = this.props.store?.state.notes || [];
+    const notes = this.props.store?.getSortedNotes() || [];
     const currentIndex = notes.findIndex(n => n.id === this.state.note?.id);
 
     if (currentIndex > 0) {
@@ -381,7 +381,7 @@ export class NoteEditor {
    * @private
    */
   _navigateToNext() {
-    const notes = this.props.store?.state.notes || [];
+    const notes = this.props.store?.getSortedNotes() || [];
     const currentIndex = notes.findIndex(n => n.id === this.state.note?.id);
 
     if (currentIndex >= 0 && currentIndex < notes.length - 1) {
@@ -399,7 +399,7 @@ export class NoteEditor {
   _updateNavButtons() {
     if (!this._prevBtn || !this._nextBtn) return;
 
-    const notes = this.props.store?.state.notes || [];
+    const notes = this.props.store?.getSortedNotes() || [];
     const currentIndex = notes.findIndex(n => n.id === this.state.note?.id);
     const isFirst = currentIndex <= 0;
     const isLast = currentIndex >= notes.length - 1;

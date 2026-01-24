@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideNote - 关于弹窗设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* 颜色系统 */
+            --color-primary: #3b82f6;
+            --color-primary-hover: #2563eb;
+            --color-primary-light: #eff6ff;
+            --color-text-primary: #1f2937;
+            --color-text-secondary: #6b7280;
+            --color-text-tertiary: #9ca3af;
+            --color-bg-primary: #ffffff;
+            --color-bg-secondary: #f9fafb;
+            --color-bg-hover: #f3f4f6;
+            --color-border: #e5e7eb;
+
+            /* 字体 */
+            --font-size-xs: 11px;
+            --font-size-sm: 12px;
+            --font-size-base: 13px;
+            --font-size-md: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 20px;
+
+            /* 间距 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+
+            /* 圆角 */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+
+            /* 阴影 */
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .open-btn {
+            padding: 12px 24px;
+            background: #fff;
+            color: #667eea;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .open-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* 遮罩层 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        /* 弹窗 */
+        .about-modal {
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-xl);
+            width: 380px;
+            max-width: 90vw;
+            box-shadow: var(--shadow-xl);
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Header */
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            font-size: 18px;
+            transition: background 0.15s;
+        }
+
+        .modal-close:hover {
+            background: var(--color-bg-hover);
+        }
+
+        /* Body */
+        .modal-body {
+            padding: var(--spacing-xl);
+        }
+
+        /* Logo 区域 */
+        .about-logo {
+            text-align: center;
+            padding: 20px 0 24px;
+        }
+
+        .about-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .about-name {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 4px;
+        }
+
+        .about-tagline {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        /* 版本信息 */
+        .about-info {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .about-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+        }
+
+        .about-info-item span:first-child {
+            font-size: 16px;
+        }
+
+        /* 分隔 */
+        .about-divider {
+            height: 1px;
+            background: var(--color-border);
+            margin: var(--spacing-lg) 0;
+        }
+
+        /* Section */
+        .about-section {
+            margin-top: var(--spacing-lg);
+        }
+
+        .section-title {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        /* 社交链接 */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+            color: var(--color-text-secondary);
+        }
+
+        .social-link:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .social-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* 链接按钮 */
+        .about-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .about-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-base);
+            transition: all 0.15s;
+        }
+
+        .about-link:hover {
+            background: var(--color-bg-hover);
+            border-color: var(--color-primary);
+        }
+
+        .about-link svg {
+            width: 16px;
+            height: 16px;
+            color: var(--color-text-secondary);
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        .modal-footer {
+            padding: var(--spacing-md) 20px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-close {
+            padding: 8px 20px;
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-close:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* 尺寸标注 */
+        .specs {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            box-shadow: var(--shadow-md);
+        }
+
+        .specs h3 {
+            font-size: var(--font-size-md);
+            margin-bottom: 8px;
+            color: var(--color-text-primary);
+        }
+
+        .specs-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .specs-label {
+            color: var(--color-text-tertiary);
+            min-width: 60px;
+        }
+
+        .specs-value {
+            color: var(--color-text-primary);
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>SlideNote 关于弹窗</h1>
+    <p class="subtitle">基于 v0.0.7 UI 设计规范</p>
+    <button class="open-btn" onclick="openModal()">打开关于弹窗</button>
+
+    <!-- 尺寸标注 -->
+    <div class="specs">
+        <h3>设计规范</h3>
+        <div class="specs-item">
+            <span class="specs-label">弹窗宽度:</span>
+            <span class="specs-value">380px</span>
+        </div>
+        <div class="specs-item">
+            <span class="specs-label">圆角:</span>
+            <span class="specs-value">12px</span>
+        </div>
+        <div class="specs-item">
+            <span class="specs-label">Logo:</span>
+            <span class="specs-value">64x64px</span>
+        </div>
+        <div class="specs-item">
+            <span class="specs-label">社交图标:</span>
+            <span class="specs-value">40x40px</span>
+        </div>
+        <div class="specs-item">
+            <span class="specs-label">主色:</span>
+            <span class="specs-value">#3b82f6</span>
+        </div>
+    </div>
+
+    <!-- 关于弹窗 -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeOutside(event)">
+        <div class="about-modal">
+            <!-- Header -->
+            <div class="modal-header">
+                <div class="modal-title">关于 SlideNote</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <!-- Logo 区域 -->
+                <div class="about-logo">
+                    <div class="about-icon">📝</div>
+                    <div class="about-name">SlideNote</div>
+                    <div class="about-tagline">侧边笔记，常伴左右</div>
+                </div>
+
+                <!-- 版本信息 -->
+                <div class="about-info">
+                    <div class="about-info-item">
+                        <span>📦</span>
+                        <span>v0.0.7</span>
+                    </div>
+                    <div class="about-info-item">
+                        <span>👨‍💻</span>
+                        <span>咕咚同学</span>
+                    </div>
+                </div>
+
+                <!-- 社交链接 -->
+                <div class="about-section">
+                    <div class="section-title">社交链接</div>
+                    <div class="social-links">
+                        <a href="https://github.com/maoruibin/SlideNote" class="social-link" title="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                            </svg>
+                        </a>
+                        <a href="https://x.com/dxgudong" class="social-link" title="X (Twitter)">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="即刻">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">📱</text>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="小红书">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">📕</text>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="微信">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <text x="50%" y="55%" text-anchor="middle" dy=".3em" font-size="14">💬</text>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="about-divider"></div>
+
+                <!-- 更多链接 -->
+                <div class="about-section">
+                    <div class="section-title">更多</div>
+                    <div class="about-links">
+                        <a href="https://my.feishu.cn/share/base/form/shrcnnfhgGcaqzU3lUfrDxamVZc" class="about-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                            </svg>
+                            <span>意见反馈</span>
+                        </a>
+                        <a href="#" class="about-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                            <span>查看更新日志</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="btn-close" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        function closeOutside(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        }
+
+        // ESC 键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

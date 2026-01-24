@@ -18,7 +18,7 @@ SlideNote is a Chrome sidebar extension for quickly storing and accessing fragme
 4. **Real-time search** — Find anything instantly
 5. **Markdown support** — Basic formatting for keys, commands, and code (v0.0.3)
 
-**Current Status**: v0.0.3 released with Markdown support.
+**Current Status**: v0.0.7 in development.
 
 ## Development Commands
 
@@ -197,6 +197,58 @@ Two types handled:
 3. Click extension icon to open side panel
 4. Use DevTools for debugging
 5. After changes, rebuild and reload extension in chrome://extensions/
+
+## Release Automation
+
+The project uses **release-it** for automated version management and release.
+
+### Release Commands
+
+```bash
+# Pre-release checks
+npm run release:check
+
+# Interactive release (recommended)
+npx release-it
+
+# Individual steps
+npm run version:sync    # Sync version to manifests
+npm run changelog       # Generate CHANGELOG
+npm run archive         # Archive release package
+```
+
+### Release Process
+
+1. **Pre-check**: Run `npm run release:check` to verify:
+   - Git working directory is clean
+   - Version format is correct (X.Y.Z)
+   - package.json and manifest.json are in sync
+
+2. **Version Bump**: Run `npx release-it` which:
+   - Asks for version increment type (major/minor/patch)
+   - Updates package.json
+   - Syncs version to manifest files via hook
+   - Creates git commit and tag
+
+3. **Build & Package**: Build production and create zip
+
+4. **Push**: Push commit and tag to trigger CI verification
+
+5. **GitHub Release**: Manually create release with gh CLI
+
+6. **Archive**: Run `npm run archive` to copy package to `releases/v{version}/`
+
+### Claude Code Skills
+
+The project includes automation skills in `skills/` directory:
+
+| Skill | Trigger | Function |
+|-------|---------|----------|
+| release | "发布" or "release" | Full release workflow |
+| bump-version | "升级版本号" | Analyze changes and recommend version |
+| generate-post | "生成推广文案" | Generate promotional content |
+
+See `skills/README.md` for details.
 
 ## Principles to Follow
 

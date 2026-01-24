@@ -194,5 +194,13 @@
   "viewSource": {
     "message": "查看源码",
     "description": "查看源码链接提示"
+  },
+  "pin": {
+    "message": "置顶",
+    "description": "置顶笔记"
+  },
+  "unpin": {
+    "message": "取消置顶",
+    "description": "取消置顶笔记"
   }
 }

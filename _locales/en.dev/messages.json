@@ -194,5 +194,13 @@
   "viewSource": {
     "message": "View Source",
     "description": "View source link tooltip"
+  },
+  "pin": {
+    "message": "Pin",
+    "description": "Pin note"
+  },
+  "unpin": {
+    "message": "Unpin",
+    "description": "Unpin note"
   }
 }

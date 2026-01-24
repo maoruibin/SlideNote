@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gudong Cover Promo Tiles</title>
+  <!-- html2canvas for saving images -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Spacing */
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 40px;
+      --space-6: 48px;
+      --space-7: 56px;
+      --space-8: 64px;
+
+      /* Brand Colors */
+      --color-bg: #09090b; 
+      --color-primary-start: #7c3aed; 
+      --color-primary-end: #2563eb;
+      
+      --color-text: #ffffff;
+      --color-text-secondary: rgba(255, 255, 255, 0.9);
+      --color-text-tertiary: rgba(255, 255, 255, 0.6);
+
+      /* Radius */
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background: #020617;
+      min-height: 100vh;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-6);
+      color: white;
+    }
+
+    .header-info { text-align: center; margin-bottom: var(--space-2); }
+    .header-info h1 {
+        background: linear-gradient(to right, #a78bfa, #60a5fa);
+        -webkit-background-clip: text;
+        color: transparent;
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .label {
+      color: #94a3b8; font-size: 13px; font-weight: 600;
+      margin-bottom: var(--space-2); letter-spacing: 0.5px; text-transform: uppercase;
+    }
+
+    .tile-wrapper { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+
+    /* Button */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+      border-radius: 99px; font-size: 13px; font-weight: 600; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1); transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
+      color: white; border: none; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+    }
+    .btn:disabled { opacity: 0.7; cursor: wait; }
+    .spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 40px; background: #10b981; color: white;
+      padding: 12px 24px; border-radius: 99px; font-weight: 500;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); transform: translateY(100px);
+      opacity: 0; transition: all 0.4s; z-index: 1000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Lang Switcher */
+    .lang-switcher {
+      position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px); border-radius: 99px; padding: 4px; display: flex; z-index: 100;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .lang-btn {
+      padding: 6px 16px; border-radius: 99px; color: #94a3b8; background: transparent;
+      border: none; font-size: 13px; cursor: pointer;
+    }
+    .lang-btn.active { background: rgba(255,255,255,0.15); color: white; font-weight: 600; }
+    [lang="en"] .zh-text { display: none; }
+    [lang="zh"] .en-text { display: none; }
+
+    /* ==================================================================
+       Tile 1: Small (440x280) 
+       ================================================================== */
+    .tile-small {
+      width: 440px; height: 280px; position: relative; overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 100% 0%, #2e1065 0%, #020617 100%);
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.5);
+    }
+    .tile-small::before {
+        content: ''; position: absolute; width: 300px; height: 300px;
+        background: conic-gradient(from 180deg at 50% 50%, #7c3aed, #db2777, #7c3aed);
+        filter: blur(80px); opacity: 0.3; top: -100px; right: -100px;
+        animation: rotate 20s linear infinite;
+    }
+    .tile-small .content {
+      position: relative; z-index: 10; height: 100%; padding: 32px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .tile-small .top-row { display: flex; justify-content: space-between; }
+    .tile-small .logo-box {
+      width: 56px; height: 56px; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tile-small .logo-box svg { width: 28px; height: 28px; color: white; }
+    .tile-small .pill-badge {
+      background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.3);
+      color: #e9d5ff; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
+    }
+    .tile-small .title {
+        font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+        background: linear-gradient(to bottom, #fff, #cbd5e1); -webkit-background-clip: text;
+        color: transparent; margin-bottom: 4px;
+    }
+    .tile-small .subtitle { font-size: 14px; color: var(--color-text-tertiary); }
+
+    /* ==================================================================
+       Tile 2: Marquee (1400x560) 
+       ================================================================== */
+    .tile-marquee {
+      width: 1400px; height: 560px; position: relative; overflow: hidden;
+      border-radius: 32px; background: #0f172a; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6);
+      display: flex;
+    }
+    .grid-bg {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px; mask-image: radial-gradient(circle at center, black, transparent 70%);
+    }
+    .glow-1 {
+        position: absolute; top: -30%; left: -10%; width: 900px; height: 900px;
+        background: radial-gradient(circle, rgba(88, 28, 135, 0.3) 0%, transparent 60%);
+    }
+    .content {
+        position: relative; z-index: 10; width: 100%; height: 100%;
+        display: flex; align-items: center; padding: 0 80px; gap: 40px;
+    }
+
+    /* Left Info: Clean & Minimal */
+    .info-col { flex: 0 0 420px; display: flex; flex-direction: column; justify-content: center; }
+    .brand-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; opacity: 0.9; }
+    .brand-icon {
+        width: 48px; height: 48px; background: linear-gradient(135deg, #7c3aed, #4f46e5);
+        border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    }
+    .brand-name { font-size: 28px; font-weight: 700; }
+    
+    .headline {
+        font-size: 64px; line-height: 1.05; font-weight: 800; margin-bottom: 20px;
+        background: linear-gradient(to right, white, #cbd5e1); -webkit-background-clip: text; color: transparent;
+    }
+    
+    .subheadline {
+        font-size: 20px; color: var(--color-text-secondary); margin-bottom: 40px; font-weight: 400;
+        max-width: 380px; line-height: 1.4;
+    }
+
+    /* Features: Pills */
+    .features { display: flex; flex-wrap: wrap; gap: 12px; }
+    .feat-pill {
+        display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06);
+        padding: 8px 16px; border-radius: 99px; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .feat-text { font-size: 14px; font-weight: 500; color: white; }
+
+    /* Right Visuals: Clean Mockups */
+    .visual-col {
+        flex: 1; height: 100%; position: relative;
+        display: flex; align-items: center; justify-content: center;
+        perspective: 2000px; /* Flatter */
+    }
+    .mockup-scene {
+        position: relative; width: 100%; height: 400px;
+        transform-style: preserve-3d; transform: rotateY(-5deg) rotateX(2deg);
+    }
+    
+    .real-card {
+        position: absolute; border-radius: 12px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;
+    }
+
+    /* WeChat Card (Back) */
+    .card-wechat {
+        width: 580px; height: 247px; /* 2.35:1 */
+        background: #1e293b; /* Clean Dark Slate */
+        top: 76px; left: -20px; z-index: 1;
+        transform: translateZ(-20px);
+        display: flex; padding: 0 40px; align-items: center; justify-content: space-between;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .wc-left { display: flex; flex-direction: column; gap: 16px; width: 65%; }
+    .wc-tag { font-size: 10px; font-weight: 700; color: #94a3b8; letter-spacing: 2px; }
+    .wc-title { font-size: 44px; font-weight: 900; line-height: 1.1; color: white; }
+    .wc-sub { font-size: 16px; color: #64748b; }
+    .wc-icon { font-size: 80px; opacity: 0.9; }
+
+    /* XHS Card (Front) */
+    .card-xhs {
+        width: 260px; height: 346px; /* ~3:4 */
+        background: #fffcf5; /* Warm White */
+        border: 8px solid #0f172a;
+        top: 27px; right: 50px; z-index: 2;
+        transform: translateZ(40px);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    }
+    .xhs-badge {
+        background: #ef4444; color: white; font-size: 16px; font-weight: 800;
+        padding: 6px 16px; border-radius: 99px; transform: rotate(-6deg);
+        border: 2px solid #0f172a; box-shadow: 2px 2px 0 #0f172a;
+    }
+    .xhs-title {
+        font-size: 48px; font-weight: 900; color: #0f172a; text-align: center; line-height: 1.1;
+    }
+    .xhs-highlight {
+        color: #7c3aed; text-decoration: underline; text-decoration-color: #facc15;
+        text-decoration-style: wavy; text-underline-offset: 6px;
+    }
+    .xhs-emoji { font-size: 64px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+
+    /* SVG */
+    .svg-def { display: none; }
+  </style>
+</head>
+<body lang="zh">
+
+  <svg class="svg-def">
+    <symbol id="icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.13 0-.93.75-1.69 1.69-1.69h1.99c3.05 0 5.55-2.5 5.55-5.55C22 6.47 17.5 2 12 2z"/>
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  </svg>
+
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('zh')">中文</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+
+  <div class="header-info">
+    <h1>Gudong Cover Assets Generator</h1>
+    <p class="label">Cleaner. Faster. Better.</p>
+    <button class="btn btn-primary" onclick="saveAllImages()">
+        <span class="zh-text">保存全部图片</span>
+        <span class="en-text">Save All Assets</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast">Images Saved!</div>
+
+  <!-- SMALL TILE -->
+  <div class="tile-wrapper">
+    <div class="label">Small Tile (440x280)</div>
+    <div class="tile-small" id="tile-small-zh" data-filename="gudong-cover-small-zh">
+        <div class="content">
+            <div class="top-row">
+                <div class="logo-box"><svg><use href="#icon-palette"></use></svg></div>
+                <div class="pill-badge">v1.0.0</div>
+            </div>
+            <div class="main-text">
+                <div class="title">Gudong Cover</div>
+                <div class="subtitle zh-text">AI 驱动的双平台封面生成器</div>
+                <div class="subtitle en-text">AI-Powered Dual Platform Cover Generator</div>
+            </div>
+        </div>
+    </div>
+    <button class="btn" onclick="saveTile('tile-small-zh')">Save PNG</button>
+  </div>
+
+  <!-- MARQUEE TILE - ZH -->
+  <div class="tile-wrapper">
+    <div class="label">Marquee Tile (1400x560) - ZH</div>
+    <div class="tile-marquee" id="tile-marquee-zh" data-filename="gudong-cover-marquee-zh">
+        <div class="grid-bg"></div>
+        <div class="glow-1"></div>
+        
+        <div class="content">
+            <div class="info-col">
+                <div class="brand-header">
+                    <div class="brand-icon"><svg><use href="#icon-palette"></use></svg></div>
+                    <div class="brand-name">Gudong Cover</div>
+                </div>
+                <div class="headline">
+                    专注写作，<br>门面交给 AI
+                </div>
+                <div class="subheadline">
+                    消除“写作最后三公里”的摩擦力。
+                </div>
+                <div class="features">
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span class="feat-text">极速生成</span>
+                    </div>
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        <span class="feat-text">双平台</span>
+                    </div>
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span class="feat-text">PNG 导出</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-col">
+                <div class="mockup-scene">
+                    <div class="real-card card-wechat">
+                        <div class="wc-left">
+                            <div class="wc-tag">GUDONG COVER</div>
+                            <div class="wc-title">深度思考<br>回归写作</div>
+                            <div class="wc-sub">让观点“体面登场”</div>
+                        </div>
+                        <div class="wc-icon">⚡️</div>
+                    </div>
+
+                    <div class="real-card card-xhs">
+                        <div class="xhs-badge">🔥 建议收藏</div>
+                        <div class="xhs-title">独立开发<br><span class="xhs-highlight">变现指南</span></div>
+                        <div class="xhs-emoji">💰</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn" onclick="saveTile('tile-marquee-zh')">Save PNG</button>
+  </div>
+
+  <!-- MARQUEE TILE - EN -->
+  <div class="tile-wrapper">
+    <div class="label">Marquee Tile (1400x560) - EN</div>
+    <div class="tile-marquee" id="tile-marquee-en" data-filename="gudong-cover-marquee-en">
+        <div class="grid-bg"></div>
+        <div class="glow-1"></div>
+        
+        <div class="content">
+            <div class="info-col">
+                <div class="brand-header">
+                    <div class="brand-icon"><svg><use href="#icon-palette"></use></svg></div>
+                    <div class="brand-name">Gudong Cover</div>
+                </div>
+                <div class="headline">
+                    Focus on writing,<br>let AI do the rest.
+                </div>
+                <div class="subheadline">
+                    Eliminate the friction of the "last three miles".
+                </div>
+                <div class="features">
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span class="feat-text">Lightning Fast</span>
+                    </div>
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        <span class="feat-text">Dual Platform</span>
+                    </div>
+                    <div class="feat-pill">
+                        <svg class="w-4 h-4" style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span class="feat-text">PNG Export</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visual-col">
+                <div class="mockup-scene">
+                    <div class="real-card card-wechat">
+                        <div class="wc-left">
+                            <div class="wc-tag">INSIGHTS</div>
+                            <div class="wc-title">Deep Work<br>Flow State</div>
+                            <div class="wc-sub">Make your ideas visible</div>
+                        </div>
+                        <div class="wc-icon">⚡️</div>
+                    </div>
+
+                    <div class="real-card card-xhs">
+                        <div class="xhs-badge">🔥 MUST READ</div>
+                        <div class="xhs-title">Indie Dev<br><span class="xhs-highlight">Guide</span></div>
+                        <div class="xhs-emoji">💰</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn" onclick="saveTile('tile-marquee-en')">Save PNG</button>
+  </div>
+
+
+  <script>
+    function setLang(lang) {
+      document.body.setAttribute('lang', lang);
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(lang === 'zh' ? '中文' : 'EN'));
+      });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        if(msg) t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(()=>t.classList.remove('show'), 2000);
+    }
+
+    async function saveTile(id) {
+        const el = document.getElementById(id);
+        const filename = el.dataset.filename;
+        const btn = el.nextElementSibling;
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div>';
+
+        try {
+            const canvas = await html2canvas(el, {
+                scale: 2,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            });
+
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename + '.png';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Image Saved!');
+                btn.disabled = false;
+                btn.innerText = originalText;
+            });
+        } catch(e) {
+            console.error(e);
+            alert('Error generating image');
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    }
+
+    async function saveAllImages() {
+        const ids = ['tile-small-zh', 'tile-marquee-zh', 'tile-marquee-en'];
+        for(let id of ids) {
+            await saveTile(id);
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+  </script>
+</body>
+</html>

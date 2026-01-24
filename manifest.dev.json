@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "__MSG_appName__",
-  "version": "0.0.5.1",
-  "version_name": "0.0.5 DEV",
+  "version": "0.0.7",
+  "version_name": "0.0.7 DEV",
   "description": "__MSG_appDesc__",
   "default_locale": "zh_CN",
   "permissions": [
@@ -18,6 +18,20 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "AboutModal.js",
+        "ExportDialog.js",
+        "ImportDialog.js",
+        "ExportManager.js",
+        "ImportManager.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",

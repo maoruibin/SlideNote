@@ -30,16 +30,17 @@ export class ContextMenu {
    * @param {Object} options - 选项配置
    * @param {number} options.index - 当前笔记索引
    * @param {number} options.total - 总笔记数
+   * @param {Object} options.note - 当前笔记对象
    */
   show(x, y, options = {}) {
-    const { index = 0, total = 1 } = options;
+    const { index = 0, total = 1, note = null } = options;
 
     // 如果已经显示，先关闭
     if (this._isVisible) {
       this.close();
     }
 
-    const menu = this._renderMenu(index, total);
+    const menu = this._renderMenu(index, total, note);
     this._positionMenu(menu, x, y);
     this._isVisible = true;
 
@@ -65,7 +66,7 @@ export class ContextMenu {
    * 渲染菜单
    * @private
    */
-  _renderMenu(index, total) {
+  _renderMenu(index, total, note) {
     // 移除旧菜单
     if (this.el) {
       this.el.remove();
@@ -73,7 +74,7 @@ export class ContextMenu {
 
     const menu = document.createElement('div');
     menu.className = 'context-menu';
-    menu.innerHTML = this._renderMenuItems(index, total);
+    menu.innerHTML = this._renderMenuItems(index, total, note);
 
     this.el = menu;
     document.body.appendChild(menu);
@@ -85,8 +86,8 @@ export class ContextMenu {
    * 渲染菜单项
    * @private
    */
-  _renderMenuItems(index, total) {
-    const items = this._getMenuItems(index, total);
+  _renderMenuItems(index, total, note) {
+    const items = this._getMenuItems(index, total, note);
 
     return items.map(item => {
       if (item.divider) {
@@ -107,10 +108,11 @@ export class ContextMenu {
    * 获取菜单项配置
    * @private
    */
-  _getMenuItems(index, total) {
+  _getMenuItems(index, total, note) {
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const isOnlyOne = total === 1;
+    const isPinned = note?.pinned || false;
 
     return [
       {
@@ -138,7 +140,17 @@ export class ContextMenu {
         disabled: isLast || isOnlyOne,
       },
       {
-        id: 'divider',
+        id: 'divider-1',
+        divider: true,
+      },
+      {
+        id: 'pin',
+        label: isPinned ? t('unpin') : t('pin'),
+        icon: isPinned ? '○' : '📌',
+        disabled: false,
+      },
+      {
+        id: 'divider-2',
         divider: true,
       },
       {
@@ -213,13 +225,14 @@ export class ContextMenu {
  * @param {number} options.y - Y坐标
  * @param {number} options.index - 当前笔记索引
  * @param {number} options.total - 总笔记数
- * @param {Function} onSelect - 选择回调
+ * @param {Object} options.note - 当前笔记对象
+ * @param {Function} options.onSelect - 选择回调
  * @returns {ContextMenu}
  */
 export function showContextMenu(options) {
-  const { x, y, index, total, onSelect } = options;
+  const { x, y, index, total, note, onSelect } = options;
   const menu = new ContextMenu();
-  menu.show(x, y, { index, total });
+  menu.show(x, y, { index, total, note });
   menu.onItemClick(onSelect);
   return menu;
 }

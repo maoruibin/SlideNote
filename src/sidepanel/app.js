@@ -10,6 +10,11 @@ import { Toolbar } from './components/Toolbar.js';
 import { NoteList } from './components/NoteList.js';
 import { NoteEditor } from './components/NoteEditor.js';
 import { ConfirmDialog } from './components/ConfirmDialog.js';
+import { MoreMenu } from './components/MoreMenu.js';
+import { Toast } from './components/Toast.js';
+import { ExportDialog } from './components/ExportDialog.js';
+import { ImportDialog } from './components/ImportDialog.js';
+import { AboutModal } from './components/AboutModal.js';
 import { t } from './utils/i18n.js';
 
 /**
@@ -176,61 +181,19 @@ class App {
     const footer = document.createElement('div');
     footer.className = 'note-list-footer';
 
-    const appFooter = document.createElement('div');
-    appFooter.className = 'app-footer';
-
-    // 作者链接（根据语言环境选择不同链接）
-    const authorDiv = document.createElement('div');
-    authorDiv.className = 'footer-author';
-    const author = t('author');
-    const developedByText = t('developedBy', [author]);
-    // 中文用 blog，英文用 dev.to
-    const uiLang = chrome.i18n.getUILanguage();
-    const authorUrl = uiLang.startsWith('zh') ? 'https://blog.gudong.site/' : 'https://dev.to/gudong';
-    authorDiv.innerHTML = developedByText.replace(
-      author,
-      `<a href="${authorUrl}" target="_blank" class="author-link">${author}</a>`
-    );
-
-    // 社交链接
-    const socialDiv = document.createElement('div');
-    socialDiv.className = 'footer-social';
-
-    // GitHub
-    const githubLink = this._createSocialLink('https://github.com/maoruibin/SlideNote', t('viewSource'), '/icons/social-github.svg');
-
-    // Twitter/X
-    const twitterLink = this._createSocialLink('https://x.com/dxgudong', 'X', '/icons/social-x.svg');
-
-    // 即刻
-    const jikeLink = this._createSocialLink('https://web.okjike.com/u/3f000c6d-bd82-4695-a404-f184652e622e', '即刻', '/icons/social-jike.svg');
-
-    // 小红书
-    const xhsLink = this._createSocialLink('https://www.xiaohongshu.com/user/profile/6690863b000000001e00e6a4', '小红书', '/icons/social-xiaohongshu.svg');
-
-    // 微信公众号 (带二维码)
-    const wechatLink = this._createWeChatLink('https://gudong.s3.bitiful.net/asset/gongzhonghao.jpg');
-
-    socialDiv.append(githubLink, twitterLink, jikeLink, xhsLink, wechatLink);
-
-    const taglineDiv = document.createElement('div');
-    taglineDiv.className = 'footer-tagline';
-    taglineDiv.textContent = t('tagline');
-
-    // 意见反馈链接
-    const feedbackDiv = document.createElement('div');
-    feedbackDiv.className = 'footer-feedback';
-    const feedbackUrl = 'https://my.feishu.cn/share/base/form/shrcnnfhgGcaqzU3lUfrDxamVZc';
-    feedbackDiv.innerHTML = `
-      <a href="${feedbackUrl}" target="_blank" class="feedback-link" title="${t('feedbackTitle')}">
-        <span class="feedback-icon">💬</span>
-        <span class="feedback-text">${t('feedback')}</span>
-      </a>
+    // 产品信息
+    const productInfo = document.createElement('div');
+    productInfo.className = 'footer-product-info';
+    productInfo.innerHTML = `
+      <div class="footer-product-name">SlideNote</div>
+      <div class="footer-product-slogan">${t('tagline') || '侧边笔记，常伴左右'}</div>
     `;
 
-    appFooter.append(authorDiv, socialDiv, taglineDiv, feedbackDiv);
-    footer.appendChild(appFooter);
+    // 更多菜单组件
+    this.components.moreMenu = new MoreMenu({ bus });
+    const moreMenuEl = this.components.moreMenu.render();
 
+    footer.append(productInfo, moreMenuEl);
     return footer;
   }
 
@@ -270,6 +233,41 @@ class App {
     bus.on('sidebar:collapse-request', async () => {
       await this._toggleSidebar();
     });
+
+    // 导出功能 - 显示格式选择对话框
+    bus.on('export:show-dialog', () => {
+      if (!this.components.exportDialog) {
+        this.components.exportDialog = new ExportDialog({ store: this.store, bus });
+      }
+      this.components.exportDialog.show();
+    });
+
+    // 导入功能 - 显示文件选择对话框
+    bus.on('import:show-dialog', () => {
+      if (!this.components.importDialog) {
+        this.components.importDialog = new ImportDialog({ store: this.store, bus });
+      }
+      this.components.importDialog.show();
+    });
+
+    // 关于弹窗
+    bus.on('about:show', () => {
+      if (!this.components.aboutModal) {
+        this.components.aboutModal = new AboutModal({ store: this.store, bus });
+      }
+      this.components.aboutModal.show();
+    });
+
+    // 笔记列表刷新（导入后触发）
+    bus.on('notes:refresh', () => {
+      // 笔记列表会自动通过 Store 的 change 事件更新
+      // 这里可以添加额外的刷新逻辑
+    });
+
+    // Toast 通知
+    bus.on('toast:show', ({ type, message }) => {
+      Toast.show(type, message);
+    });
   }
 
   /**
@@ -293,63 +291,6 @@ class App {
     });
 
     this.dialog.show();
-  }
-
-  /**
-   * 创建社交链接
-   * @private
-   */
-  _createSocialLink(href, tooltip, iconPath) {
-    const link = document.createElement('a');
-    link.href = href;
-    link.target = '_blank';
-    link.className = 'footer-social-link';
-    link.setAttribute('data-tooltip', tooltip);
-
-    // 创建图片元素加载 SVG
-    const img = document.createElement('img');
-    img.src = iconPath;
-    img.alt = tooltip;
-    img.className = 'footer-social-icon';
-    link.appendChild(img);
-
-    return link;
-  }
-
-  /**
-   * 创建微信链接（带二维码）
-   * @private
-   */
-  _createWeChatLink(qrCodeUrl) {
-    const link = document.createElement('span');
-    link.className = 'footer-social-link footer-wechat-link';
-
-    // 创建图片元素加载 SVG 图标
-    const img = document.createElement('img');
-    img.src = '/icons/social-wechat.svg';
-    img.alt = '微信公众号';
-    img.className = 'footer-social-icon';
-    link.appendChild(img);
-
-    // 创建二维码弹层
-    const qrPopup = document.createElement('div');
-    qrPopup.className = 'footer-qr-popup';
-
-    const qrImg = document.createElement('img');
-    qrImg.src = qrCodeUrl;
-    qrImg.alt = '公众号二维码';
-    qrImg.className = 'footer-qr-img';
-    qrPopup.appendChild(qrImg);
-
-    // 添加文案
-    const qrText = document.createElement('div');
-    qrText.className = 'footer-qr-text';
-    qrText.textContent = '扫码关注 公众号 咕咚同学';
-    qrPopup.appendChild(qrText);
-
-    link.appendChild(qrPopup);
-
-    return link;
   }
 
   /**

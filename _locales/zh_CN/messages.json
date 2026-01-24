@@ -190,5 +190,115 @@
   "viewSource": {
     "message": "查看源码",
     "description": "查看源码链接提示"
+  },
+  "more": {
+    "message": "更多",
+    "description": "更多菜单"
+  },
+  "exportNotes": {
+    "message": "导出笔记",
+    "description": "导出笔记按钮"
+  },
+  "importBackup": {
+    "message": "导入备份",
+    "description": "导入备份按钮"
+  },
+  "export": {
+    "message": "导出",
+    "description": "导出按钮"
+  },
+  "formatJSONDesc": {
+    "message": "完整备份，包含元数据",
+    "description": "JSON 格式说明"
+  },
+  "formatMDDesc": {
+    "message": "可读性强，适合查看",
+    "description": "Markdown 格式说明"
+  },
+  "selectFile": {
+    "message": "选择备份文件",
+    "description": "选择文件按钮"
+  },
+  "importTip": {
+    "message": "导入前请先导出当前备份",
+    "description": "导入提示"
+  },
+  "importSuccess": {
+    "message": "已导入 $1$ 条笔记",
+    "description": "导入成功提示",
+    "placeholders": {
+      "1": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "noNewNotesToImport": {
+    "message": "没有新笔记需要导入",
+    "description": "没有新笔记提示"
+  },
+  "importFailed": {
+    "message": "导入失败",
+    "description": "导入失败提示"
+  },
+  "noNotesToExport": {
+    "message": "还没有笔记可导出",
+    "description": "无笔记导出提示"
+  },
+  "exportSuccess": {
+    "message": "导出成功",
+    "description": "导出成功提示"
+  },
+  "exportFailed": {
+    "message": "导出失败",
+    "description": "导出失败提示"
+  },
+  "invalidFileType": {
+    "message": "请选择 JSON 格式的备份文件",
+    "description": "文件类型错误"
+  },
+  "invalidBackupFormat": {
+    "message": "无效的备份文件格式",
+    "description": "备份格式错误"
+  },
+  "aboutTitle": {
+    "message": "关于 SlideNote",
+    "description": "关于弹窗标题"
+  },
+  "socialLinks": {
+    "message": "社交链接",
+    "description": "社交链接标题"
+  },
+  "changelog": {
+    "message": "查看更新日志",
+    "description": "更新日志链接"
+  },
+  "close": {
+    "message": "关闭",
+    "description": "关闭按钮"
+  },
+  "exportedAt": {
+    "message": "导出时间",
+    "description": "导出时间标签"
+  },
+  "noteCount": {
+    "message": "笔记数量",
+    "description": "笔记数量标签"
+  },
+  "about": {
+    "message": "关于",
+    "description": "关于按钮"
+  },
+  "expandSidebar": {
+    "message": "展开侧边栏",
+    "description": "展开侧边栏按钮"
+  },
+  "pin": {
+    "message": "置顶",
+    "description": "置顶笔记"
+  },
+  "unpin": {
+    "message": "取消置顶",
+    "description": "取消置顶笔记"
   }
 }

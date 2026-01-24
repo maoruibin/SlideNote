@@ -1,6 +1,6 @@
 {
   "name": "slidenote",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SlideNote - 侧边栏笔记插件",
   "type": "module",
   "scripts": {
@@ -10,10 +10,15 @@
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "package": "npm run build && node scripts/package.mjs",
-    "package:prod": "npm run build:prod && node scripts/package.mjs"
+    "package:prod": "npm run build:prod && node scripts/package.mjs",
+    "release:check": "node scripts/pre-release-check.mjs",
+    "version:sync": "node scripts/sync-manifest.mjs",
+    "changelog": "node scripts/generate-changelog.mjs",
+    "archive": "node scripts/archive-package.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.254",
+    "release-it": "^19.2.4",
     "sharp": "^0.34.5",
     "typescript": "^5.3.3",
     "vite": "^5.0.11"
