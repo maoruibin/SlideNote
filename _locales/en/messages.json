@@ -300,5 +300,25 @@
   "unpin": {
     "message": "Unpin",
     "description": "Unpin note"
+  },
+  "saveToSlideNote": {
+    "message": "Save to SlideNote",
+    "description": "Context menu to save selection"
+  },
+  "savedToSlideNote": {
+    "message": "Saved to SlideNote",
+    "description": "Save success notification title"
+  },
+  "webSelectionsTitle": {
+    "message": "Web Selections",
+    "description": "Web selections note title"
+  },
+  "selectionTooLong": {
+    "message": "Selection too long, please save manually",
+    "description": "Selection too long error"
+  },
+  "storageFull": {
+    "message": "Storage full",
+    "description": "Storage full error"
   }
 }

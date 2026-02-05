@@ -74,7 +74,20 @@
 
 [点击此处前往 Chrome 应用商店安装](https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom)
 
-### 方式二：本地下载安装
+### 方式二：Edge 浏览器用户
+
+> SlideNote 完全兼容 Microsoft Edge 浏览器（Edge 114+），但暂未上架 Edge 商店。
+
+Edge 用户请使用手动安装方式：
+
+1. 从 [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) 下载最新版本并解压
+2. 打开 Edge 浏览器
+3. 访问 `edge://extensions/`
+4. 开启左下角的「开发人员模式」
+5. 点击「加载解压缩的扩展」
+6. 选择解压后的文件夹
+
+### 方式三：本地下载安装
 
 从 [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) 下载最新版本：
 
@@ -85,7 +98,7 @@
 5. 点击「加载已解压的扩展程序」
 6. 选择解压后的文件夹
 
-### 方式三：从源码构建
+### 方式四：从源码构建
 
 ```bash
 # 克隆仓库

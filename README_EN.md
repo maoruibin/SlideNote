@@ -56,7 +56,20 @@
 
 [Click here to install from Chrome Web Store](https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom)
 
-### Option 2: Download Local Package
+### Option 2: Microsoft Edge Users
+
+> SlideNote is fully compatible with Microsoft Edge (Edge 114+), but not yet published on Edge Add-ons store.
+
+Edge users please install manually:
+
+1. Download the latest release from [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) and unzip
+2. Open Edge browser
+3. Go to `edge://extensions/`
+4. Enable "Developer mode" in the bottom left
+5. Click "Load unpacked"
+6. Select the unzipped folder
+
+### Option 3: Download Local Package
 
 Download the latest release from [GitHub Releases](https://github.com/maoruibin/SlideNote/releases) and install manually:
 
@@ -67,7 +80,7 @@ Download the latest release from [GitHub Releases](https://github.com/maoruibin/
 5. Click "Load unpacked"
 6. Select the unzipped folder
 
-### Option 3: Build from Source
+### Option 4: Build from Source
 
 ```bash
 # Clone the repository

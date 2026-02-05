@@ -6,7 +6,9 @@
   "default_locale": "zh_CN",
   "permissions": [
     "storage",
-    "sidePanel"
+    "sidePanel",
+    "contextMenus",
+    "notifications"
   ],
   "background": {
     "service_worker": "background.js"

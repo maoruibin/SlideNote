@@ -300,5 +300,25 @@
   "unpin": {
     "message": "取消置顶",
     "description": "取消置顶笔记"
+  },
+  "saveToSlideNote": {
+    "message": "保存到 SlideNote",
+    "description": "右键菜单保存选中内容"
+  },
+  "savedToSlideNote": {
+    "message": "已保存到 SlideNote",
+    "description": "保存成功通知标题"
+  },
+  "webSelectionsTitle": {
+    "message": "网页摘录",
+    "description": "网页摘录笔记标题"
+  },
+  "selectionTooLong": {
+    "message": "内容过长，请手动保存",
+    "description": "选中文字过长提示"
+  },
+  "storageFull": {
+    "message": "存储空间不足",
+    "description": "存储空间已满"
   }
 }

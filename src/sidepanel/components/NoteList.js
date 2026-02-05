@@ -198,11 +198,14 @@ export class NoteList {
       this._contextMenu.close();
     }
 
+    // 使用排序后的笔记列表获取正确的 total（与显示顺序一致）
+    const notes = this.props.store ? this.props.store.getSortedNotes() : this.state.notes;
+
     this._contextMenu = showContextMenu({
       x: e.clientX,
       y: e.clientY,
       index,
-      total: this.state.notes.length,
+      total: notes.length,
       note: note,
       onSelect: (action) => this._handleMenuAction(action, note),
     });
@@ -217,17 +220,11 @@ export class NoteList {
     if (!store) return;
 
     switch (action) {
-      case 'move-top':
-        await store.moveNoteToTop(note.id);
-        break;
       case 'move-up':
         await store.moveNoteUp(note.id);
         break;
       case 'move-down':
         await store.moveNoteDown(note.id);
-        break;
-      case 'move-bottom':
-        await store.moveNoteToBottom(note.id);
         break;
       case 'pin':
         await store.togglePin(note.id);

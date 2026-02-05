@@ -58,7 +58,7 @@ export class NoteEditor {
 
   render() {
     const container = document.createElement('div');
-    container.className = 'note-content-section';
+    container.className = 'note-editor-wrapper';
 
     if (!this.state.note) {
       container.innerHTML = this._renderEmpty();
@@ -123,8 +123,8 @@ export class NoteEditor {
       }
     };
 
-    // 获取当前笔记在列表中的位置
-    const notes = this.props.store?.state.notes || [];
+    // 获取当前笔记在列表中的位置（使用置顶排序后的顺序）
+    const notes = this.props.store?.getSortedNotes() || [];
     const currentIndex = notes.findIndex(n => n.id === this.state.note?.id);
     const isFirst = currentIndex <= 0;
     const isLast = currentIndex >= notes.length - 1;

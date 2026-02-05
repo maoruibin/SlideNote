@@ -101,6 +101,12 @@
 
     /* 折叠状态边框 */
     --collapsed-border: rgba(255, 255, 255, 0.06);
+
+    /* 置顶笔记 - 暗色友好的橙色调 */
+    --pinned-bg: #2d1f0f;        /* 深橙底色 */
+    --pinned-bg-hover: #3a2a14;   /* 悬停稍亮 */
+    --pinned-bg-active: #4a351a;  /* 选中态 */
+    --pinned-accent: #f59e0b;     /* 橙色竖条（保持鲜艳）*/
   }
 
   /* 暗色模式下的图标颜色反转 */
@@ -545,12 +551,12 @@ button {
 
 /* 置顶笔记：极浅橙背景 */
 .note-item.pinned {
-  background: #fff9f0;  /* 极浅的橙色背景 */
+  background: var(--pinned-bg, #fff9f0);
 }
 
 /* 置顶笔记悬停效果 */
 .note-item.pinned:hover {
-  background: #fff3e0;  /* 稍深的橙色背景 */
+  background: var(--pinned-bg-hover, #fff3e0);
 }
 
 /* 置顶笔记与普通笔记之间的分隔线 */
@@ -569,7 +575,7 @@ button {
 
 /* 置顶笔记选中状态：在黄色基础上加深 */
 .note-item.pinned.active {
-  background: #ffe8cc;  /* 比未选中时深的橙色 */
+  background: var(--pinned-bg-active, #ffe8cc);
   box-shadow: var(--shadow-sm);
 }
 
@@ -581,12 +587,13 @@ button {
   top: 6px;
   bottom: 6px;
   width: 3px;
-  background: #f59e0b;  /* 橙色竖条 */
+  background: var(--pinned-accent, #f59e0b);
   border-radius: 0 2px 2px 0;
 }
 
 .note-item.pinned.active:hover {
-  background: #ffdcb8;  /* 选中态悬停，再深一点 */
+  background: var(--pinned-bg-active, #ffe8cc);
+  opacity: 0.9;
 }
 
 .note-item-title {
@@ -699,6 +706,15 @@ button {
   display: flex;
   flex-direction: column;
   background: var(--color-bg-primary);
+  overflow: hidden;
+}
+
+/* 编辑器外层容器（NoteEditor 组件） */
+.note-editor-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 

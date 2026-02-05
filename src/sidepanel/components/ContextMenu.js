@@ -116,12 +116,6 @@ export class ContextMenu {
 
     return [
       {
-        id: 'move-top',
-        label: t('moveToTop'),
-        icon: '⇧',
-        disabled: isFirst || isOnlyOne,
-      },
-      {
         id: 'move-up',
         label: t('moveUp'),
         icon: '↑',
@@ -131,12 +125,6 @@ export class ContextMenu {
         id: 'move-down',
         label: t('moveDown'),
         icon: '↓',
-        disabled: isLast || isOnlyOne,
-      },
-      {
-        id: 'move-bottom',
-        label: t('moveToBottom'),
-        icon: '⇩',
         disabled: isLast || isOnlyOne,
       },
       {
