@@ -15,26 +15,26 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.6-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.8-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-在线安装-green"></a>
 </p>
 
 ---
 
-## 🆕 最新版本 v0.0.6
+## 🆕 最新版本 v0.0.8
 
 ### 新增功能
-- 🌙 **夜间模式** — 自动跟随系统深色模式，护眼又舒适
+- 🔖 **网页摘录** — 右键保存网页选中内容，按日期自动聚合
 
 ### Bug 修复
-- 🐛 修复删除笔记后编辑器内容不更新的问题
-- 🎨 修复暗色模式下社交图标颜色不适配的问题
+- 🐛 修复夜间模式置顶笔记颜色问题
+- 🐛 修复导航按钮在置顶笔记间的问题
+- 🐛 修复 chrome:// 页面报错
+- 🐛 修复编辑器 Header 长内容时消失的问题
 
 ### 体验优化
-- 🎨 **Toolbar 重新设计** — 搜索/返回无边框，新建按钮占满中间
-- 🎨 统一按钮图标尺寸，视觉更协调
-- 🎨 左右间距对称，布局更平衡
+- 🎯 简化右键菜单，移除冗余选项
 
 📜 **查看完整更新日志** → [CHANGELOG.md](CHANGELOG.md)
 
@@ -43,13 +43,15 @@
 ## ✨ 特性
 
 - **📌 侧边栏展示** — 固定在浏览器侧边，随时可用
+- **🔖 网页摘录** — 右键保存网页选中内容，按日期聚合
 - **✍️ Markdown 编辑** — 支持预览/编辑模式，实时渲染
 - **📋 富文本复制** — 复制带样式的文本，可直接粘贴到其他应用
 - **💾 自动保存** — 停止输入 1 秒后自动保存
 - **🔄 跨设备同步** — 基于 Chrome Storage API，自动云端同步
 - **🔍 搜索过滤** — 实时搜索标题和内容
+- **📌 笔记置顶** — 重要笔记固定在顶部
 - **⬆️⬇️ 导航切换** — 上下箭头快速切换笔记
-- **⚡️ 极致轻量** — 无框架依赖，打包仅 24KB
+- **⚡️ 极致轻量** — 无框架依赖，打包仅 57KB
 
 ---
 
@@ -122,12 +124,21 @@ npm run build:prod
 
 ## 🚀 使用方法
 
+### 基本使用
+
 1. 点击 Chrome 工具栏的 SlideNote 图标
 2. 侧边栏展开，即可开始使用
 3. 点击「新建笔记」创建第一条笔记
 4. 点击笔记项切换，开始编辑
 5. 右键点击笔记可排序或删除
 6. 停止输入 1 秒后自动保存
+
+### 网页摘录
+
+1. 在任意网页选中文字
+2. 右键点击「保存到 SlideNote」
+3. 内容自动保存到当天的「网页摘录」笔记
+4. 摘录按日期自动聚合，同一天的摘录在一起
 
 ---
 

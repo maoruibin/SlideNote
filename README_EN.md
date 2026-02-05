@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.5-blue"></a>
+  <a href="https://github.com/maoruibin/SlideNote"><img alt="GitHub version" src="https://img.shields.io/badge/version-0.0.8-blue"></a>
   <a href="https://github.com/maoruibin/SlideNote/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="https://chromewebstore.google.com/detail/appaojacakbjbbellfehlgjophpdpjom"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome%20Web%20Store-Online-green"></a>
 </p>
@@ -25,11 +25,14 @@
 ## ✨ Features
 
 - **📌 Sidebar Panel, Never Blocks Content** — Lives in your browser sidebar, always accessible without covering your page
+- **🔖 Web Clipper** — Right-click to save selected text from any webpage, aggregated by date
 - **⚡️ Instant Access** — Opens in < 100ms, no app switching needed
 - **🔄 Auto-Sync Across Devices** — Uses Chrome Storage API, your fragments follow you everywhere
 - **🔍 Instant Search** — Real-time filter across all notes
 - **📝 Markdown Support** — Basic formatting for keys, commands, and code
+- **📌 Pin Notes** — Keep important notes at the top
 - **💾 Auto-Save** — Saves automatically 1 second after you stop typing
+- **⚡️ Ultra Lightweight** — No framework dependencies, only 57KB
 
 ---
 
