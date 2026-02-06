@@ -25,16 +25,11 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 // ============================================
-// 插件安装/更新 - 初始化
+// Context Menu 初始化
 // ============================================
 
-chrome.runtime.onInstalled.addListener(async () => {
-  // 设置侧边栏为默认打开
-  await chrome.sidePanel.setOptions({
-    enabled: true
-  });
-
-  // 清空所有菜单后创建新菜单（避免重复）
+// 每次创建右键菜单的函数
+function createContextMenu() {
   chrome.contextMenus.removeAll(() => {
     const menuTitle = chrome.i18n.getMessage('saveToSlideNote') || 'Save to SlideNote';
     chrome.contextMenus.create({
@@ -43,6 +38,20 @@ chrome.runtime.onInstalled.addListener(async () => {
       contexts: ['selection']
     });
   });
+}
+
+// Service Worker 启动时立即创建（确保更新后也能工作）
+createContextMenu();
+
+// 插件安装/更新时也创建
+chrome.runtime.onInstalled.addListener(async () => {
+  // 设置侧边栏为默认打开
+  await chrome.sidePanel.setOptions({
+    enabled: true
+  });
+
+  // 重新创建菜单
+  createContextMenu();
 });
 
 // ============================================

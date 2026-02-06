@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "__MSG_appName__",
-  "version": "0.0.8",
-  "version_name": "0.0.7 DEV",
+  "version": "0.0.8.1",
+  "version_name": "0.0.8.1 DEV",
   "description": "__MSG_appDesc__",
   "default_locale": "zh_CN",
   "permissions": [
