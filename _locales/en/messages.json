@@ -105,123 +105,25 @@
     "message": "Gudong",
     "description": "Author"
   },
-  "tagline": {
-    "message": "Slide notes, always by your side",
-    "description": "Tagline"
+  "storageUsage": {
+    "message": "Storage Usage",
+    "description": "Storage usage title"
   },
-  "developedBy": {
-    "message": "Developed by $1$",
-    "description": "Developed by",
-    "placeholders": {
-      "1": {
-        "content": "$1",
-        "example": "Gudong"
-      }
-    }
+  "syncNotes": {
+    "message": "Synced Notes",
+    "description": "Synced notes (cross-device)"
   },
-  "lastEdited": {
-    "message": "Last edited",
-    "description": "Last edited time"
+  "storageTip": {
+    "message": "Recommended for important information only to avoid sync limits.",
+    "description": "Storage tip"
   },
-  "copyAsMarkdown": {
-    "message": "Copy as Markdown",
-    "description": "Copy as Markdown source"
+  "storageAlmostFull": {
+    "message": "Storage almost full, please delete some notes",
+    "description": "Storage warning"
   },
-  "copyAsRichText": {
-    "message": "Copy as Rich Text",
-    "description": "Copy as rich text (with styling)"
-  },
-  "syntaxHelp": {
-    "message": "Syntax Quick Reference",
-    "description": "Markdown syntax help"
-  },
-  "copiedMarkdown": {
-    "message": "Markdown source copied to clipboard",
-    "description": "Copy success message"
-  },
-  "copiedRichText": {
-    "message": "Rich text copied to clipboard",
-    "description": "Copy rich text success message"
-  },
-  "copiedPlainText": {
-    "message": "Plain text copied to clipboard",
-    "description": "Copy plain text success message"
-  },
-  "copyFailed": {
-    "message": "Copy failed",
-    "description": "Copy failed message"
-  },
-  "markdownSyntaxTitle": {
-    "message": "Markdown Syntax Reference",
-    "description": "Syntax help modal title"
-  },
-  "syntaxTip": {
-    "message": "Tip: Delimiters fade automatically, won't affect reading",
-    "description": "Syntax tip description"
-  },
-  "togglePreview": {
-    "message": "Toggle Preview",
-    "description": "Toggle preview mode button"
-  },
-  "previewMode": {
-    "message": "Preview Mode",
-    "description": "Preview mode"
-  },
-  "editMode": {
-    "message": "Edit Mode",
-    "description": "Edit mode"
-  },
-  "editNote": {
-    "message": "Edit",
-    "description": "Edit note button"
-  },
-  "previewNote": {
-    "message": "Preview",
-    "description": "Preview note button"
-  },
-  "feedback": {
-    "message": "Feedback",
-    "description": "Feedback link"
-  },
-  "feedbackTitle": {
-    "message": "Submit feedback to help us improve",
-    "description": "Feedback link tooltip"
-  },
-  "viewSource": {
-    "message": "View Source",
-    "description": "View source link tooltip"
-  },
-  "more": {
-    "message": "More",
-    "description": "More menu"
-  },
-  "exportNotes": {
-    "message": "Export Notes",
-    "description": "Export notes button"
-  },
-  "importBackup": {
-    "message": "Import Backup",
-    "description": "Import backup button"
-  },
-  "export": {
-    "message": "Export",
-    "description": "Export button"
-  },
-  "formatJSONDesc": {
-    "message": "Full backup with metadata",
-    "description": "JSON format description"
-  },
-  "formatMDDesc": {
-    "message": "Readable, suitable for viewing",
-    "description": "Markdown format description"
-  },
-  "selectFile": {
-    "message": "Select backup file",
-    "description": "Select file button"
-  },
-  "importTip": {
-    "message": "Please export current backup before importing",
-    "description": "Import tip"
+  "gotIt": {
+    "message": "Got it",
+    "description": "Got it button"
   },
   "importSuccess": {
     "message": "Imported $1$ notes",
@@ -289,10 +191,6 @@
     "message": "About",
     "description": "About button"
   },
-  "expandSidebar": {
-    "message": "Expand sidebar",
-    "description": "Expand sidebar button"
-  },
   "pin": {
     "message": "Pin",
     "description": "Pin note"
@@ -321,4 +219,5 @@
     "message": "Storage full",
     "description": "Storage full error"
   }
+}
 }

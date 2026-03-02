@@ -17,6 +17,7 @@ export class ImportDialog {
   #dialog = null;
   #fileInput = null;
   #handleEscape = null;
+  #selectedFile = null;  // 保存选中的文件
 
   constructor(props = {}) {
     this.props = props;
@@ -67,6 +68,12 @@ export class ImportDialog {
         <input type="file" accept=".json" class="file-input" style="display:none">
 
         <p class="import-tip">${t('importTip') || '导入前请先导出当前备份'}</p>
+
+        <label class="import-option">
+          <input type="checkbox" class="import-clear-checkbox" id="importClear">
+          <span>${t('clearBeforeImport') || '清空现有数据后导入'}</span>
+        </label>
+        <p class="import-option-tip">${t('clearBeforeImportTip') || '勾选后将删除所有现有笔记，仅保留备份文件中的数据'}</p>
       </div>
 
       <div class="dialog-footer">
@@ -153,8 +160,26 @@ export class ImportDialog {
    * @private
    */
   async #doImport(file) {
+    // 检查是否选择了清空选项
+    const shouldClear = this.#dialog.querySelector('.import-clear-checkbox')?.checked || false;
+
+    // 如果选择了清空，显示确认对话框
+    if (shouldClear) {
+      const confirmed = await this.#showConfirmDialog();
+      if (!confirmed) {
+        // 用户取消，重置文件输入
+        this.#fileInput.value = '';
+        return;
+      }
+    }
+
     try {
       const importer = ImportManager.getInstance(this.store);
+
+      // 如果需要清空，先执行清空
+      if (shouldClear) {
+        await this.#clearExistingNotes();
+      }
 
       const result = await importer.importFromFile(file);
 
@@ -177,6 +202,79 @@ export class ImportDialog {
       console.error('Import error:', error);
       Toast.error((t('importFailed') || '导入失败') + ': ' + error.message);
     }
+  }
+
+  /**
+   * 显示确认对话框
+   * @returns {Promise<boolean>} 用户是否确认
+   * @private
+   */
+  #showConfirmDialog() {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.style.zIndex = '1001';
+
+      const dialog = document.createElement('div');
+      dialog.className = 'confirm-dialog';
+      dialog.innerHTML = `
+        <div class="dialog-header">
+          <span class="dialog-title">${t('confirmClear') || '确认清空'}</span>
+        </div>
+        <div class="dialog-body">
+          <p>${t('confirmClearMessage') || '清空后将删除所有现有笔记，此操作无法撤销。是否继续？'}</p>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn btn-secondary" data-action="cancel">${t('cancel') || '取消'}</button>
+          <button class="btn btn-primary" data-action="confirm">${t('confirm') || '确认'}</button>
+        </div>
+      `;
+
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+
+      requestAnimationFrame(() => {
+        overlay.classList.add('show');
+      });
+
+      const cleanup = () => {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+        }, 200);
+      };
+
+      dialog.querySelector('[data-action="cancel"]')?.addEventListener('click', () => {
+        cleanup();
+        resolve(false);
+      });
+
+      dialog.querySelector('[data-action="confirm"]')?.addEventListener('click', () => {
+        cleanup();
+        resolve(true);
+      });
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          cleanup();
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  /**
+   * 清空现有笔记
+   * @private
+   */
+  async #clearExistingNotes() {
+    // 清空 sync storage 中的笔记
+    await chrome.storage.sync.remove(['slidenote_notes']);
+    // 清空 local storage 中的网页摘录
+    await chrome.storage.local.remove(['slidenote_web_clippings']);
+    // 重置 store 中的笔记
+    this.store.state.notes = [];
+    this.store.state.activeNoteId = null;
   }
 
   /**

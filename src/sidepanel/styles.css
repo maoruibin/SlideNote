@@ -26,18 +26,15 @@
   --scrollbar-thumb: #d0d0d0;
   --scrollbar-thumb-hover: #b0b0b0;
 
-  /* 折叠状态边框 */
-  --collapsed-border: rgba(0, 0, 0, 0.06);
-
   /* 字体 */
   --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI",
                       "Helvetica Neue", Arial, sans-serif;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-base: 13px;
-  --font-size-md: 14px;
-  --font-size-lg: 16px;
-  --font-size-xl: 20px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 22px;
 
   /* 间距 */
   --spacing-xs: 3px;
@@ -98,9 +95,6 @@
     /* 滚动条 - 暗色滚动条 */
     --scrollbar-thumb: #4a4a4a;
     --scrollbar-thumb-hover: #5a5a5a;
-
-    /* 折叠状态边框 */
-    --collapsed-border: rgba(255, 255, 255, 0.06);
 
     /* 置顶笔记 - 暗色友好的橙色调 */
     --pinned-bg: #2d1f0f;        /* 深橙底色 */
@@ -198,136 +192,6 @@ button {
   position: relative;
 }
 
-/* 侧边栏折叠状态 */
-.note-list-section.collapsed {
-  width: 90px;
-}
-
-/* 折叠时隐藏的内容 */
-.note-list-section.collapsed .toolbar,
-.note-list-section.collapsed .note-list-footer {
-  display: none;
-}
-
-/* 折叠状态：顶部按钮区域 */
-.note-list-section.collapsed .top-actions {
-  padding: 8px 6px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border-bottom: 1px solid var(--collapsed-border);
-  background: var(--color-bg-secondary);
-}
-
-/* 折叠状态：新建按钮 */
-.new-btn-collapsed {
-  width: 36px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: var(--color-bg-primary);
-  transition: all var(--duration-fast) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.new-btn-collapsed:hover {
-  background: var(--color-primary-light);
-}
-
-.new-btn-collapsed svg {
-  width: 14px;
-  height: 14px;
-}
-
-/* 折叠状态：展开按钮 */
-.expand-btn-small {
-  width: 36px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: transparent;
-  transition: all var(--duration-fast) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.expand-btn-small:hover {
-  background: var(--color-bg-hover);
-  color: var(--color-text-primary);
-}
-
-.expand-btn-small svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* 折叠状态：笔记列表保持显示，但样式调整 */
-.note-list-section.collapsed .note-list {
-  padding: 6px 4px;
-}
-
-/* 折叠状态：笔记项样式 */
-.note-list-section.collapsed .note-item {
-  padding: 8px 4px;
-  margin-bottom: 2px;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 折叠状态：隐藏预览文本 */
-.note-list-section.collapsed .note-item-preview {
-  display: none;
-}
-
-/* 折叠状态：标题水平显示（截断） */
-.note-list-section.collapsed .note-item-title {
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
-  padding-left: 6px;
-  line-height: 1.4;
-  width: 100%;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-/* 折叠状态：选中时左侧蓝条 */
-.note-list-section.collapsed .note-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3px;
-  background: var(--color-primary);
-  border-radius: 0 2px 2px 0;
-}
-
-/* 折叠状态：激活状态使用白色背景 */
-.note-list-section.collapsed .note-item.active {
-  background: var(--color-bg-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-/* 折叠状态：hover 效果 */
-.note-list-section.collapsed .note-item:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
 /* ============================================
    Toolbar - 顶部工具栏
    ============================================ */
@@ -349,39 +213,7 @@ button {
   flex: 1;
 }
 
-/* Toolbar 右侧区域 */
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-/* 收起按钮（展开状态，在 toolbar 右侧） */
-.collapse-btn-inline {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: transparent;
-  transition: all var(--duration-fast) var(--ease-out);
-  flex-shrink: 0;
-}
-
-.collapse-btn-inline:hover {
-  background: var(--color-bg-hover);
-  color: var(--color-text-primary);
-}
-
-.collapse-btn-inline svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* 搜索图标按钮（收起状态） */
+/* 搜索图标按钮 */
 .search-icon-btn {
   width: 32px;
   height: 32px;
@@ -597,7 +429,7 @@ button {
 }
 
 .note-item-title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: 500;
   color: var(--color-text-primary);
   overflow: hidden;
@@ -1823,6 +1655,198 @@ button {
   margin-top: var(--spacing-md);
 }
 
+/* 导入选项 */
+.import-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.import-option:hover {
+  background: var(--color-bg-hover);
+}
+
+.import-option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.import-option span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.import-option-tip {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--spacing-xs);
+  margin-left: var(--spacing-md);
+  line-height: 1.4;
+}
+
+/* ============================================
+   存储容量条
+   ============================================ */
+.storage-bar {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+}
+
+.storage-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+  transition: color var(--duration-fast);
+}
+
+.storage-info:hover {
+  color: var(--color-text-secondary);
+}
+
+.storage-info.warning {
+  color: #f59e0b;
+}
+
+.storage-info.danger {
+  color: #ef4444;
+}
+
+.storage-progress {
+  height: 3px;
+  background: var(--color-bg-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.storage-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width var(--duration-fast), background var(--duration-fast);
+}
+
+.storage-info.warning .storage-progress-fill {
+  background: #f59e0b;
+}
+
+.storage-info.danger .storage-progress-fill {
+  background: #ef4444;
+}
+
+/* 存储详情对话框 */
+.storage-detail-dialog {
+  width: 360px;
+  max-width: 90vw;
+}
+
+/* 存储空间详情弹窗 */
+.storage-modal {
+  width: 360px;
+  max-width: 90vw;
+}
+
+.storage-detail-section {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.storage-detail-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.storage-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.storage-detail-title {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.storage-detail-percent {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.storage-detail-size {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.storage-detail-progress {
+  height: 6px;
+  background: var(--color-bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-xs);
+}
+
+.storage-detail-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 3px;
+  transition: width var(--duration-fast), background var(--duration-fast);
+}
+
+.storage-detail-fill.warning {
+  background: #f59e0b;
+}
+
+.storage-detail-fill.danger {
+  background: #ef4444;
+}
+
+.storage-detail-note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.storage-detail-tip {
+  padding: var(--spacing-sm);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-top: var(--spacing-md);
+}
+
+/* 确认对话框 */
+.confirm-dialog {
+  width: 320px;
+  max-width: 90vw;
+}
+
+.confirm-dialog .dialog-body p {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ============================================
    关于弹窗
    ============================================ */
@@ -1884,6 +1908,58 @@ button {
 
 .about-info-item span:first-child {
   font-size: 16px;
+}
+
+/* 存储容量显示 */
+.about-storage {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.storage-title {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.storage-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.storage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-xs);
+}
+
+.storage-label {
+  color: var(--color-text-secondary);
+}
+
+.storage-value {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.storage-value.storage-medium {
+  color: #f59e0b;
+}
+
+.storage-value.storage-warning {
+  color: #ef4444;
+}
+
+.storage-note {
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
 }
 
 /* 分隔线 */

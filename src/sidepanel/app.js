@@ -15,6 +15,7 @@ import { Toast } from './components/Toast.js';
 import { ExportDialog } from './components/ExportDialog.js';
 import { ImportDialog } from './components/ImportDialog.js';
 import { AboutModal } from './components/AboutModal.js';
+import { StorageBar } from './components/StorageBar.js';
 import { t } from './utils/i18n.js';
 
 /**
@@ -26,7 +27,6 @@ class App {
     this.syncManager = null;
     this.components = {};
     this.dialog = null;
-    this._listSection = null;  // 笔记列表区域引用
   }
 
   /**
@@ -67,16 +67,32 @@ class App {
     // 创建左侧笔记列表区域
     const listSection = document.createElement('div');
     listSection.className = 'note-list-section';
-    this._listSection = listSection;
 
-    // 根据初始状态渲染展开或折叠状态
-    const isCollapsed = this.store?.isSidebarCollapsed() || false;
-    if (isCollapsed) {
-      listSection.classList.add('collapsed');
-      this._renderCollapsedState(listSection);
-    } else {
-      this._renderExpandedState(listSection);
-    }
+    // 顶部工具栏
+    this.components.toolbar = new Toolbar({ bus });
+    const toolbarEl = this.components.toolbar.render();
+    listSection.appendChild(toolbarEl);
+
+    // 存储容量条
+    this.components.storageBar = new StorageBar({ store: this.store });
+    const storageBarEl = this.components.storageBar.render();
+    listSection.appendChild(storageBarEl);
+
+    // 笔记列表
+    this.components.noteList = new NoteList({ store: this.store, bus });
+    const noteListEl = this.components.noteList.render();
+    this.components.noteList.el = noteListEl;
+    listSection.appendChild(noteListEl);
+
+    // 绑定事件委托
+    this.components.noteList._bindItemEvents(noteListEl);
+
+    // 初始化 _itemMap
+    this.components.noteList.initialize();
+
+    // 底部页脚
+    const footer = this._renderFooter();
+    listSection.appendChild(footer);
 
     // 创建右侧内容区域
     const contentSection = document.createElement('div');
@@ -90,87 +106,6 @@ class App {
 
     // 添加到容器
     container.append(listSection, contentSection);
-  }
-
-  /**
-   * 渲染展开状态
-   * @private
-   */
-  _renderExpandedState(listSection) {
-    // 清空现有内容
-    listSection.innerHTML = '';
-
-    // 顶部工具栏
-    this.components.toolbar = new Toolbar({ bus });
-    const toolbarEl = this.components.toolbar.render();
-    listSection.appendChild(toolbarEl);
-
-    // 笔记列表
-    this.components.noteList = new NoteList({ store: this.store, bus });
-    const noteListEl = this.components.noteList.render();
-    this.components.noteList.el = noteListEl;
-    listSection.appendChild(noteListEl);
-
-    // 底部页脚
-    const footer = this._renderFooter();
-    listSection.appendChild(footer);
-  }
-
-  /**
-   * 渲染折叠状态
-   * @private
-   */
-  _renderCollapsedState(listSection) {
-    // 清空现有内容
-    listSection.innerHTML = '';
-
-    // 顶部按钮区域
-    const topActions = this._renderTopActions();
-    listSection.appendChild(topActions);
-
-    // 笔记列表（复用现有组件）
-    this.components.noteList = new NoteList({ store: this.store, bus });
-    const noteListEl = this.components.noteList.render();
-    this.components.noteList.el = noteListEl;
-    listSection.appendChild(noteListEl);
-  }
-
-  /**
-   * 渲染顶部按钮区域（折叠状态）
-   * @private
-   */
-  _renderTopActions() {
-    const container = document.createElement('div');
-    container.className = 'top-actions';
-
-    // 新建按钮
-    const newBtn = document.createElement('div');
-    newBtn.className = 'new-btn-collapsed';
-    newBtn.title = t('newNote') || '新建笔记';
-    newBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-    `;
-    newBtn.onclick = () => {
-      bus.emit('note:create');
-    };
-
-    // 展开按钮
-    const expandBtn = document.createElement('div');
-    expandBtn.className = 'expand-btn-small';
-    expandBtn.title = t('expandSidebar') || '展开侧边栏';
-    expandBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 14 12 9 7"/>
-      </svg>
-    `;
-    expandBtn.onclick = () => {
-      this._toggleSidebar();
-    };
-
-    container.append(newBtn, expandBtn);
-    return container;
   }
 
   /**
@@ -204,8 +139,6 @@ class App {
   _setupGlobalListeners() {
     // 新建笔记 - 延迟触发编辑模式
     bus.on('note:create', async () => {
-      // 侧边栏折叠时自动展开
-      await this.expandSidebar();
       const result = await this.store.createNote();
       bus.emit('note:select', result.id);
       // 延迟触发编辑模式（等待渲染完成）
@@ -217,21 +150,6 @@ class App {
     // 删除笔记请求
     bus.on('note:delete-request', (note) => {
       this._showDeleteConfirm(note);
-    });
-
-    // 搜索展开时自动展开侧边栏
-    bus.on('search:expand', async () => {
-      await this.expandSidebar();
-    });
-
-    // 侧边栏展开请求（折叠状态下点击笔记时）
-    bus.on('sidebar:expand-request', async () => {
-      await this.expandSidebar();
-    });
-
-    // 侧边栏收起请求（新增）
-    bus.on('sidebar:collapse-request', async () => {
-      await this._toggleSidebar();
     });
 
     // 导出功能 - 显示格式选择对话框
@@ -291,39 +209,6 @@ class App {
     });
 
     this.dialog.show();
-  }
-
-  /**
-   * 切换侧边栏折叠状态
-   * @private
-   */
-  async _toggleSidebar() {
-    const isCollapsed = this.store.isSidebarCollapsed();
-    const newState = !isCollapsed;
-
-    if (newState) {
-      // 切换到折叠状态
-      this._listSection.classList.add('collapsed');
-      this._renderCollapsedState(this._listSection);
-    } else {
-      // 切换到展开状态
-      this._listSection.classList.remove('collapsed');
-      this._renderExpandedState(this._listSection);
-    }
-
-    // 持久化状态
-    await this.store.setSidebarCollapsed(newState);
-  }
-
-  /**
-   * 展开侧边栏（在需要时调用）
-   */
-  async expandSidebar() {
-    if (!this.store.isSidebarCollapsed()) return;
-
-    this._listSection.classList.remove('collapsed');
-    this._renderExpandedState(this._listSection);
-    await this.store.setSidebarCollapsed(false);
   }
 
   /**

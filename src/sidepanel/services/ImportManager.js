@@ -140,18 +140,35 @@ export class ImportManager {
     }));
 
     // 使用批量导入方法
-    await this.store.importNotes(normalizedNotes);
+    try {
+      await this.store.importNotes(normalizedNotes);
 
-    this._showToast(
-      'success',
-      (t('importSuccess') || '已导入 $1$ 条笔记').replace('$1$', newNotes.length)
-    );
+      this._showToast(
+        'success',
+        (t('importSuccess') || '已导入 $1$ 条笔记').replace('$1$', newNotes.length)
+      );
 
-    return {
-      success: true,
-      count: newNotes.length,
-      skipped: importedNotes.length - newNotes.length
-    };
+      return {
+        success: true,
+        count: newNotes.length,
+        skipped: importedNotes.length - newNotes.length
+      };
+    } catch (error) {
+      // 处理存储容量错误
+      let errorMessage = error.message || (t('importFailed') || '导入失败');
+
+      // 提取友好的错误信息
+      if (errorMessage.includes('STORAGE_QUOTA_EXCEEDED')) {
+        errorMessage = errorMessage.replace('STORAGE_QUOTA_EXCEEDED: ', '');
+      }
+
+      this._showToast('error', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
   }
 
   /**

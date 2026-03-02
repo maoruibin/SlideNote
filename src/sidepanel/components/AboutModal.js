@@ -41,6 +41,39 @@ export class AboutModal {
     });
 
     this.#isOpen = true;
+
+    // 获取并显示存储容量
+    this.#updateStorageInfo();
+  }
+
+  /**
+   * 更新存储容量信息
+   * @private
+   */
+  async #updateStorageInfo() {
+    try {
+      const syncData = await chrome.storage.sync.get({ slidenote_notes: [] });
+
+      // 计算 sync 容量（限制 100KB）
+      const syncNotes = syncData.slidenote_notes || [];
+      const syncSize = JSON.stringify(syncNotes).length;
+      const syncKB = (syncSize / 1024).toFixed(2);
+      const syncMaxKB = (100).toFixed(0);
+      const syncPercent = Math.min(100, (syncSize / 102400) * 100).toFixed(0);
+
+      // 更新 DOM
+      const syncEl = this.#modal.querySelector('#syncStorage');
+
+      if (syncEl) {
+        const syncClass = syncPercent > 80 ? 'storage-warning' : (syncPercent > 50 ? 'storage-medium' : '');
+        syncEl.className = `storage-value ${syncClass}`;
+        syncEl.textContent = `${syncKB}KB / ${syncMaxKB}KB (${syncPercent}%)`;
+      }
+    } catch (error) {
+      console.error('Failed to get storage info:', error);
+      const syncEl = this.#modal.querySelector('#syncStorage');
+      if (syncEl) syncEl.textContent = '获取失败';
+    }
   }
 
   /**
@@ -80,6 +113,18 @@ export class AboutModal {
             <span>👨‍💻</span>
             <span>${t('author') || '咕咚同学'}</span>
           </div>
+        </div>
+
+        <!-- 存储容量 -->
+        <div class="about-storage" id="storageInfo">
+          <div class="storage-title">${t('storageUsage') || '存储使用情况'}</div>
+          <div class="storage-items">
+            <div class="storage-item">
+              <span class="storage-label">${t('syncNotes') || '笔记'}</span>
+              <span class="storage-value" id="syncStorage">计算中...</span>
+            </div>
+          </div>
+          <div class="storage-note">${t('storageNote') || '笔记会在设备间自动同步'}</div>
         </div>
 
         <div class="about-divider"></div>

@@ -105,6 +105,18 @@
     "message": "咕咚同学",
     "description": "作者"
   },
+  "storageUsage": {
+    "message": "存储使用情况",
+    "description": "存储容量标题"
+  },
+  "syncNotes": {
+    "message": "同步笔记",
+    "description": "同步笔记（跨设备）"
+  },
+  "storageNote": {
+    "message": "笔记会在设备间自动同步",
+    "description": "存储说明"
+  },
   "tagline": {
     "message": "Slide notes, always by your side",
     "description": "标语"
@@ -223,6 +235,50 @@
     "message": "导入前请先导出当前备份",
     "description": "导入提示"
   },
+  "clearBeforeImport": {
+    "message": "清空现有数据后导入",
+    "description": "清空选项"
+  },
+  "clearBeforeImportTip": {
+    "message": "勾选后将删除所有现有笔记，仅保留备份文件中的数据",
+    "description": "清空选项说明"
+  },
+  "confirmClear": {
+    "message": "确认清空",
+    "description": "确认清空标题"
+  },
+  "confirmClearMessage": {
+    "message": "清空后将删除所有现有笔记，此操作无法撤销。是否继续？",
+    "description": "确认清空消息"
+  },
+  "confirm": {
+    "message": "确认",
+    "description": "确认按钮"
+  },
+  "syncStorage": {
+    "message": "同步",
+    "description": "同步存储简称"
+  },
+  "storageDetail": {
+    "message": "存储空间",
+    "description": "存储详情标题"
+  },
+  "syncNotesDesc": {
+    "message": "跨设备同步，可在所有设备上访问",
+    "description": "同步笔记说明"
+  },
+  "storageTip": {
+    "message": "建议只存储重要信息，避免超出同步限制。",
+    "description": "存储提示"
+  },
+  "storageAlmostFull": {
+    "message": "存储空间不足，请删除部分笔记",
+    "description": "存储空间警告"
+  },
+  "gotIt": {
+    "message": "知道了",
+    "description": "知道了按钮"
+  },
   "importSuccess": {
     "message": "已导入 $1$ 条笔记",
     "description": "导入成功提示",
@@ -289,10 +345,6 @@
     "message": "关于",
     "description": "关于按钮"
   },
-  "expandSidebar": {
-    "message": "展开侧边栏",
-    "description": "展开侧边栏按钮"
-  },
   "pin": {
     "message": "置顶",
     "description": "置顶笔记"
@@ -301,24 +353,4 @@
     "message": "取消置顶",
     "description": "取消置顶笔记"
   },
-  "saveToSlideNote": {
-    "message": "保存到 SlideNote",
-    "description": "右键菜单保存选中内容"
-  },
-  "savedToSlideNote": {
-    "message": "已保存到 SlideNote",
-    "description": "保存成功通知标题"
-  },
-  "webSelectionsTitle": {
-    "message": "网页摘录",
-    "description": "网页摘录笔记标题"
-  },
-  "selectionTooLong": {
-    "message": "内容过长，请手动保存",
-    "description": "选中文字过长提示"
-  },
-  "storageFull": {
-    "message": "存储空间不足",
-    "description": "存储空间已满"
-  }
 }

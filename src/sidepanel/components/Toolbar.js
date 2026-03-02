@@ -39,15 +39,6 @@ export class Toolbar {
 
     container.appendChild(leftArea);
 
-    // 右侧区域：收起按钮
-    const rightArea = document.createElement('div');
-    rightArea.className = 'toolbar-right';
-
-    const collapseBtn = this._renderCollapseButton();
-    rightArea.appendChild(collapseBtn);
-
-    container.appendChild(rightArea);
-
     this.el = container;
     return container;
   }
@@ -71,25 +62,6 @@ export class Toolbar {
       this.props.bus?.emit('note:create');
     };
     return newNoteBtn;
-  }
-
-  /**
-   * 渲染收起按钮
-   * @private
-   */
-  _renderCollapseButton() {
-    const btn = document.createElement('div');
-    btn.className = 'collapse-btn-inline';
-    btn.title = t('collapseSidebar') || '收起侧边栏';
-    btn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="11 17 6 12 11 7"/>
-      </svg>
-    `;
-    btn.onclick = () => {
-      this.props.bus?.emit('sidebar:collapse-request');
-    };
-    return btn;
   }
 
   /**

@@ -9,10 +9,17 @@ import { bus } from './EventBus.js';
  * 存储键名
  */
 const STORAGE_KEYS = {
-  NOTES: 'slidenote_notes',
+  NOTES: 'slidenote_notes',              // 笔记 (sync，跨设备同步)
   ACTIVE_NOTE_ID: 'slidenote_active_id',
-  SIDEBAR_COLLAPSED: 'slidenote_sidebar_collapsed',
 };
+
+/**
+ * Chrome Storage Sync API 限制
+ * 单个 item 最大约 8KB (实际 8192 字节，JSON 字符串会更大)
+ * 保守估计为 7000 字节，留有余量
+ */
+const MAX_ITEM_SIZE = 7000;
+const MAX_TOTAL_SIZE = 90000; // 总容量约 100KB，保守估计 90KB
 
 /**
  * 简单的 EventEmitter 实现
@@ -61,11 +68,9 @@ export class Store extends EventEmitter {
       notes: [],
       activeNoteId: null,
       searchQuery: '',
-      sidebarCollapsed: false,  // 侧边栏折叠状态
     };
     this._ready = false;
     this._localChanges = new Map();  // 跟踪本地变更的时间戳
-    this._isApplyingRemoteChanges = false;  // 是否正在应用远程变更
     this._syncManager = null;  // 引用 SyncManager
   }
 
@@ -81,15 +86,14 @@ export class Store extends EventEmitter {
    * 初始化：从 Chrome Storage 加载数据
    */
   async init() {
+    // 从 sync 存储读取数据
     const result = await chrome.storage.sync.get({
       [STORAGE_KEYS.NOTES]: [],
       [STORAGE_KEYS.ACTIVE_NOTE_ID]: null,
-      [STORAGE_KEYS.SIDEBAR_COLLAPSED]: false,
     });
 
     this.state.notes = result[STORAGE_KEYS.NOTES] || [];
     this.state.activeNoteId = result[STORAGE_KEYS.ACTIVE_NOTE_ID];
-    this.state.sidebarCollapsed = result[STORAGE_KEYS.SIDEBAR_COLLAPSED] || false;
 
     // 按创建时间倒序排序
     this._sortNotes();
@@ -137,16 +141,33 @@ export class Store extends EventEmitter {
    * @returns {Promise<number>} 导入的笔记数量
    */
   async importNotes(notes) {
+    // 直接添加到数组，不触发单个笔记的事件
     for (const note of notes) {
-      // 直接添加到数组，不触发单个笔记的事件
       this.state.notes.unshift(note);
     }
 
     // 按排序值重新排序
     this._sortNotes();
 
-    // 一次性持久化
-    await this._persist();
+    // 检查数据大小
+    const syncSize = JSON.stringify(this.state.notes).length;
+    console.log(`[Import] 导入笔记: ${this.state.notes.length} 条, 大小: ${Math.round(syncSize / 1024)}KB`);
+
+    if (syncSize > MAX_TOTAL_SIZE) {
+      console.warn(`[Import] 数据过大: ${Math.round(syncSize / 1024)}KB，可能超过限制`);
+    }
+
+    // 一次性持久化（带错误处理）
+    try {
+      await this._persist();
+    } catch (error) {
+      // 如果保存失败，回滚内存中的更改
+      this.state.notes = this.state.notes.filter(n => !notes.find(imported => imported.id === n.id));
+      this._sortNotes();
+
+      console.error('[Import] 保存失败:', error);
+      throw error;
+    }
 
     // 触发一次全局变化事件
     this.emit('change');
@@ -203,11 +224,17 @@ export class Store extends EventEmitter {
    * @param {string} id
    */
   async setActiveNote(id) {
-    this.state.activeNoteId = id;
-    await chrome.storage.sync.set({
-      [STORAGE_KEYS.ACTIVE_NOTE_ID]: id,
-    });
-    this.emit('active-changed', id);
+    // 只在值真的变化时才写入存储
+    if (this.state.activeNoteId !== id) {
+      this.state.activeNoteId = id;
+      await chrome.storage.sync.set({
+        [STORAGE_KEYS.ACTIVE_NOTE_ID]: id,
+      });
+      this.emit('active-changed', id);
+    } else {
+      // 即使存储值相同，也要更新内存状态
+      this.state.activeNoteId = id;
+    }
   }
 
   /**
@@ -372,6 +399,7 @@ export class Store extends EventEmitter {
   /**
    * 持久化到 Chrome Storage
    * @private
+   * @throws {Error} 当保存失败时抛出错误
    */
   async _persist() {
     // 设置同步标志，防止触发同步循环
@@ -380,16 +408,46 @@ export class Store extends EventEmitter {
     }
 
     try {
-      await chrome.storage.sync.set({
-        [STORAGE_KEYS.NOTES]: this.state.notes,
-        [STORAGE_KEYS.ACTIVE_NOTE_ID]: this.state.activeNoteId,
+      // 获取当前存储的数据，用于比较是否真的有变化
+      const currentSync = await chrome.storage.sync.get({
+        [STORAGE_KEYS.NOTES]: [],
+        [STORAGE_KEYS.ACTIVE_NOTE_ID]: null,
       });
+
+      // 准备存储操作
+      const operations = [];
+
+      // 只有当数据真的变化时才写入（避免不必要的 onChanged 触发）
+      const currentNotes = currentSync[STORAGE_KEYS.NOTES] || [];
+      const currentActiveId = currentSync[STORAGE_KEYS.ACTIVE_NOTE_ID];
+
+      if (JSON.stringify(this.state.notes) !== JSON.stringify(currentNotes) ||
+          currentActiveId !== this.state.activeNoteId) {
+        operations.push(
+          chrome.storage.sync.set({
+            [STORAGE_KEYS.NOTES]: this.state.notes,
+            [STORAGE_KEYS.ACTIVE_NOTE_ID]: this.state.activeNoteId,
+          })
+        );
+      }
+
+      // 只有有操作时才执行
+      if (operations.length > 0) {
+        await Promise.all(operations);
+      }
+    } catch (error) {
+      // 捕获 Chrome Storage 错误并转换为友好的错误信息
+      if (error.message?.includes('QUOTA_BYTES') || error.message?.includes('quota')) {
+        const currentSize = JSON.stringify(this.state.notes).length;
+        throw new Error(`STORAGE_QUOTA_EXCEEDED: 同步数据大小 (${Math.round(currentSize / 1024)}KB) 超过 Chrome Storage 限制。\n\n请删除一些笔记后再试。`);
+      }
+      throw error;
     } finally {
       // 延迟重置标志
       if (this._syncManager) {
         setTimeout(() => {
           this._syncManager._syncInProgress = false;
-        }, 1000);
+        }, 500);
       }
     }
   }
@@ -456,26 +514,6 @@ export class Store extends EventEmitter {
   _sortNotes() {
     this.state.notes.sort((a, b) => (b.order ?? 0) - (a.order ?? 0));
   }
-
-  /**
-   * 切换侧边栏折叠状态
-   * @param {boolean} collapsed 是否折叠
-   */
-  async setSidebarCollapsed(collapsed) {
-    this.state.sidebarCollapsed = collapsed;
-    await chrome.storage.sync.set({
-      [STORAGE_KEYS.SIDEBAR_COLLAPSED]: collapsed,
-    });
-    this.emit('sidebar-toggled', collapsed);
-  }
-
-  /**
-   * 获取侧边栏折叠状态
-   * @returns {boolean}
-   */
-  isSidebarCollapsed() {
-    return this.state.sidebarCollapsed;
-  }
 }
 
 /**
@@ -498,47 +536,67 @@ export class SyncManager {
    */
   _setupListener() {
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName !== 'sync') return;
+      if (areaName === 'sync') {
+        // 跨设备同步
+        const hasChanges =
+          changes[STORAGE_KEYS.NOTES] ||
+          changes[STORAGE_KEYS.ACTIVE_NOTE_ID];
 
-      // 检查是否有我们的数据变化
-      const hasChanges =
-        changes[STORAGE_KEYS.NOTES] ||
-        changes[STORAGE_KEYS.ACTIVE_NOTE_ID];
-
-      if (hasChanges && !this._syncInProgress) {
-        this._handleSyncChange(changes);
+        if (hasChanges && !this._syncInProgress) {
+          this._handleSyncChange(changes);
+        }
       }
     });
   }
 
   /**
-   * 处理同步变化
+   * 处理跨设备同步变化（sync storage）
    * @param {Object} changes Chrome Storage 变化对象
    * @private
    */
   async _handleSyncChange(changes) {
+    // 如果正在应用远程变更，忽略此事件（防止同步循环）
+    if (this._syncInProgress) {
+      return;
+    }
+
+    // 获取变化的键，只处理 NOTES 或 ACTIVE_NOTE_ID 的变化
+    const changedKeys = Object.keys(changes);
+    const hasRelevantChange = changedKeys.includes(STORAGE_KEYS.NOTES) ||
+                               changedKeys.includes(STORAGE_KEYS.ACTIVE_NOTE_ID);
+
+    if (!hasRelevantChange) {
+      return;
+    }
+
     this._syncInProgress = true;
 
     try {
-      // 获取远程数据
-      const result = await chrome.storage.sync.get({
+      // 获取 sync 数据
+      const syncResult = await chrome.storage.sync.get({
         [STORAGE_KEYS.NOTES]: [],
         [STORAGE_KEYS.ACTIVE_NOTE_ID]: null,
       });
 
-      const remoteNotes = result[STORAGE_KEYS.NOTES] || [];
-      const remoteActiveId = result[STORAGE_KEYS.ACTIVE_NOTE_ID];
+      const syncNotes = syncResult[STORAGE_KEYS.NOTES] || [];
+      const remoteActiveId = syncResult[STORAGE_KEYS.ACTIVE_NOTE_ID];
 
       // 使用冲突解决策略合并数据
-      const mergedNotes = this.store._resolveConflicts(remoteNotes);
+      const mergedNotes = this.store._resolveConflicts(syncNotes);
 
-      // 检查是否有变化
-      const hasChanges =
-        JSON.stringify(mergedNotes) !== JSON.stringify(this.store.state.notes) ||
-        remoteActiveId !== this.store.state.activeNoteId;
+      // 深度比较：检查是否真的有变化
+      const currentNotesSorted = JSON.stringify(
+        this.store.state.notes.slice().sort((a, b) => (a.id || '').localeCompare(b.id || ''))
+      );
+      const newNotesSorted = JSON.stringify(
+        mergedNotes.slice().sort((a, b) => (a.id || '').localeCompare(b.id || ''))
+      );
 
-      if (hasChanges) {
-        // 更新本地状态
+      const hasNoteChanges = currentNotesSorted !== newNotesSorted;
+      const hasActiveChanges = remoteActiveId !== this.store.state.activeNoteId;
+
+      if (hasNoteChanges) {
+        // 笔记有变化，更新并通知 UI
         const previousNotes = this.store.state.notes;
         this.store.state.notes = mergedNotes;
         this.store.state.activeNoteId = remoteActiveId;
@@ -560,12 +618,16 @@ export class SyncManager {
         });
 
         console.log('SlideNote: Synced from cloud with conflict resolution');
+      } else if (hasActiveChanges) {
+        // 只有 activeId 变化，只更新状态不触发 change
+        this.store.state.activeNoteId = remoteActiveId;
+        // 不触发 emit('change')，避免列表重渲染
       }
     } finally {
       // 延迟重置标志，避免在同步过程中再次触发
       setTimeout(() => {
         this._syncInProgress = false;
-      }, 1000);
+      }, 500);
     }
   }
 }

@@ -116,6 +116,16 @@ export class ContextMenu {
 
     return [
       {
+        id: 'pin',
+        label: isPinned ? t('unpin') : t('pin'),
+        icon: isPinned ? '○' : '📌',
+        disabled: false,
+      },
+      {
+        id: 'divider-1',
+        divider: true,
+      },
+      {
         id: 'move-up',
         label: t('moveUp'),
         icon: '↑',
@@ -126,16 +136,6 @@ export class ContextMenu {
         label: t('moveDown'),
         icon: '↓',
         disabled: isLast || isOnlyOne,
-      },
-      {
-        id: 'divider-1',
-        divider: true,
-      },
-      {
-        id: 'pin',
-        label: isPinned ? t('unpin') : t('pin'),
-        icon: isPinned ? '○' : '📌',
-        disabled: false,
       },
       {
         id: 'divider-2',
