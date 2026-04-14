@@ -73,16 +73,16 @@ class App {
     const toolbarEl = this.components.toolbar.render();
     listSection.appendChild(toolbarEl);
 
-    // 存储容量条
-    this.components.storageBar = new StorageBar({ store: this.store });
-    const storageBarEl = this.components.storageBar.render();
-    listSection.appendChild(storageBarEl);
-
     // 笔记列表
     this.components.noteList = new NoteList({ store: this.store, bus });
     const noteListEl = this.components.noteList.render();
     this.components.noteList.el = noteListEl;
     listSection.appendChild(noteListEl);
+
+    // 存储容量条（列表底部）
+    this.components.storageBar = new StorageBar({ store: this.store });
+    const storageBarEl = this.components.storageBar.render();
+    listSection.appendChild(storageBarEl);
 
     // 绑定事件委托
     this.components.noteList._bindItemEvents(noteListEl);

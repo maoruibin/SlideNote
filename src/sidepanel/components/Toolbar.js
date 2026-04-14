@@ -15,7 +15,6 @@ export class Toolbar {
     this.el = null;
     this._searchContainer = null;  // 搜索区域容器
     this._searchInput = null;
-    this._newNoteBtnText = null;  // 新建按钮文字 span
     this._searchBtn = null;        // 搜索图标按钮引用
   }
 
@@ -54,10 +53,7 @@ export class Toolbar {
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 5v14M5 12h14"/>
       </svg>
-      <span></span>
     `;
-    this._newNoteBtnText = newNoteBtn.querySelector('span');
-    this._updateNewNoteText();
     newNoteBtn.onclick = () => {
       this.props.bus?.emit('note:create');
     };
@@ -132,22 +128,11 @@ export class Toolbar {
   }
 
   /**
-   * 更新新建按钮文字
-   * @private
-   */
-  _updateNewNoteText() {
-    if (this._newNoteBtnText) {
-      this._newNoteBtnText.textContent = this.state.isSearchExpanded ? t('newNoteShort') : t('newNote');
-    }
-  }
-
-  /**
    * 展开搜索框
    */
   expandSearch() {
     this.state.isSearchExpanded = true;
     this._renderSearchArea(this._searchContainer);
-    this._updateNewNoteText();
     this.props.bus?.emit('search:expand');
   }
 
@@ -158,7 +143,6 @@ export class Toolbar {
     this.state.isSearchExpanded = false;
     this.state.searchValue = '';
     this._renderSearchArea(this._searchContainer);
-    this._updateNewNoteText();
     this.props.bus?.emit('search:collapse');
     this.props.bus?.emit('search:change', '');
   }
