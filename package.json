@@ -1,6 +1,6 @@
 {
   "name": "slidenote",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "SlideNote - 侧边栏笔记插件",
   "type": "module",
   "scripts": {
