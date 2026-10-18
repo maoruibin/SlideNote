@@ -1,8 +1,9 @@
 /**
  * EditorMoreMenu - 编辑器更多菜单组件
  *
- * 编辑器右上角 [⋮] 下拉菜单
- * 功能：复制为富文本、复制为 Markdown、语法帮助
+ * 编辑器右上角 [⋮] 下拉菜单（常驻）
+ * 功能：复制为富文本、复制为 Markdown、预览/编辑切换、语法帮助、
+ *       导入备份、导出笔记、意见反馈、关于、删除笔记
  *
  * @module components/EditorMoreMenu
  */
@@ -45,6 +46,16 @@ export class EditorMoreMenu {
         type: 'divider',
       },
       {
+        id: 'toggle-preview',
+        icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M1 8s2.5-4.5 7-4.5S15 8 15 8s-2.5 4.5-7 4.5S1 8 1 8z"/>
+          <circle cx="8" cy="8" r="2"/>
+        </svg>`,
+        // 文案在 open() 时按当前模式动态刷新（预览 ↔ 编辑）
+        label: t('previewNote') || '预览',
+        action: () => bus.emit('editor:toggle-mode'),
+      },
+      {
         id: 'syntax-help',
         icon: `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <circle cx="8" cy="8" r="7" fill-opacity="0.1"/>
@@ -56,6 +67,34 @@ export class EditorMoreMenu {
       },
       {
         id: 'divider-2',
+        type: 'divider',
+      },
+      {
+        id: 'import-backup',
+        icon: '📥',
+        label: t('importBackup') || '导入备份',
+        action: () => bus.emit('import:show-dialog'),
+      },
+      {
+        id: 'export-notes',
+        icon: '📤',
+        label: t('exportNotes') || '导出笔记',
+        action: () => bus.emit('export:show-dialog'),
+      },
+      {
+        id: 'feedback',
+        icon: '💬',
+        label: t('feedback') || '意见反馈',
+        action: () => chrome.tabs.create({ url: 'https://my.feishu.cn/share/base/form/shrcnnfhgGcaqzU3lUfrDxamVZc' }),
+      },
+      {
+        id: 'about',
+        icon: 'ℹ️',
+        label: t('about') || '关于',
+        action: () => bus.emit('about:show'),
+      },
+      {
+        id: 'divider-3',
         type: 'divider',
       },
       {
@@ -117,6 +156,8 @@ export class EditorMoreMenu {
     label.textContent = item.label;
 
     element.append(icon, label);
+    // 记录元素引用，便于 open() 时刷新动态文案
+    item.el = element;
 
     // 点击事件
     element.onclick = () => {
@@ -141,6 +182,9 @@ export class EditorMoreMenu {
       document.body.appendChild(this.el);
     }
 
+    // 按当前编辑/预览模式刷新切换项文案
+    this._refreshDynamicLabels();
+
     // 定位菜单
     this._positionMenu(anchor);
 
@@ -155,6 +199,19 @@ export class EditorMoreMenu {
       this.el.style.opacity = '1';
       this.el.style.transform = 'translateY(0) scale(1)';
     });
+  }
+
+  /**
+   * 刷新动态文案（预览/编辑切换项）
+   * @private
+   */
+  _refreshDynamicLabels() {
+    const isPreview = !!this.props.isPreviewMode?.();
+    const toggleItem = this._menuItems.find(item => item.id === 'toggle-preview');
+    if (toggleItem?.el) {
+      toggleItem.el.querySelector('.menu-item-label').textContent =
+        isPreview ? (t('editNote') || '编辑') : (t('previewNote') || '预览');
+    }
   }
 
   /**
@@ -195,6 +252,7 @@ export class EditorMoreMenu {
 
     const rect = anchor.getBoundingClientRect();
     const menuWidth = 200;
+    const menuHeight = this.el.offsetHeight || 300;
     const offset = 4;
 
     // 右对齐，按钮下方
@@ -203,8 +261,8 @@ export class EditorMoreMenu {
 
     // 边界检查
     if (left < 0) left = rect.left;
-    if (top + 250 > window.innerHeight) {
-      top = rect.top - this.el.offsetHeight - offset;
+    if (top + menuHeight > window.innerHeight) {
+      top = Math.max(rect.top - menuHeight - offset, 8);
     }
 
     this.el.style.position = 'fixed';

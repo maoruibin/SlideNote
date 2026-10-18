@@ -9,7 +9,6 @@ import { bus } from './core/EventBus.js';
 import { NoteList } from './components/NoteList.js';
 import { NoteEditor } from './components/NoteEditor.js';
 import { ConfirmDialog } from './components/ConfirmDialog.js';
-import { MoreMenu } from './components/MoreMenu.js';
 import { Toast } from './components/Toast.js';
 import { ExportDialog } from './components/ExportDialog.js';
 import { ImportDialog } from './components/ImportDialog.js';
@@ -69,9 +68,6 @@ class App {
     // 实例化存储容量条
     this.components.storageBar = new StorageBar({ store: this.store });
 
-    // 实例化全局更多菜单组件
-    this.components.moreMenu = new MoreMenu({ bus });
-
     // 决定并通知 NoteEditor 初始抽屉的状态（如果没有活动笔记或没有笔记，默认展开）
     const activeNoteId = this.store.state.activeNoteId;
     const hasNotes = this.store.state.notes && this.store.state.notes.length > 0;
@@ -83,7 +79,6 @@ class App {
       bus,
       noteList: this.components.noteList,
       storageBar: this.components.storageBar,
-      footerMoreMenu: this.components.moreMenu,
       initialListOpen
     });
 

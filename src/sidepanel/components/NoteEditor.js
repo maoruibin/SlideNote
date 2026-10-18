@@ -51,7 +51,6 @@ export class NoteEditor {
     this._moreBtn = null;
     this._previewMode = false;    // 默认编辑模式
     this._previewLayer = null;
-    this._modeToggleBtn = null;   // 模式切换按钮引用
 
     // 侧边滑动抽屉状态
     this._isDrawerOpen = props.initialListOpen !== undefined ? props.initialListOpen : false;
@@ -64,6 +63,14 @@ export class NoteEditor {
       }
     };
     document.addEventListener('keydown', this._escHandler);
+
+    // 侧边栏尺寸变化时重新对齐浮动面板
+    this._resizeHandler = () => {
+      if (this._isDrawerOpen) {
+        this._syncPopoverPosition();
+      }
+    };
+    window.addEventListener('resize', this._resizeHandler);
 
     this._setupListeners();
   }
@@ -88,7 +95,7 @@ export class NoteEditor {
 
     container.append(header, editorEl);
 
-    // 创建抽屉半透明背景遮罩
+    // 创建浮动笔记面板（含半透明遮罩，点击外部关闭）
     const backdrop = document.createElement('div');
     backdrop.className = 'drawer-backdrop';
     if (this._isDrawerOpen) {
@@ -99,21 +106,14 @@ export class NoteEditor {
       this._closeListDrawer();
     };
 
-    // 创建左侧滑动列表抽屉
+    // 浮动面板：锚定在顶部栏下方
     const drawer = document.createElement('div');
-    drawer.className = 'list-drawer';
+    drawer.className = 'list-popover';
     if (this._isDrawerOpen) {
       drawer.classList.add('open');
     }
 
-    // 将存储容量条挂载至抽屉最顶部
-    if (this.props.storageBar) {
-      const storageEl = this.props.storageBar.render();
-      this.props.storageBar.el = storageEl;
-      drawer.appendChild(storageEl);
-    }
-
-    // 将笔记列表挂载至抽屉
+    // 将笔记列表挂载至面板（优先展示）
     if (this.props.noteList) {
       const listEl = this.props.noteList.render();
       this.props.noteList.el = listEl;
@@ -122,25 +122,32 @@ export class NoteEditor {
       this.props.noteList.initialize();
     }
 
-    // 渲染并挂载抽屉底部的 "更多面板" (Slogan, 关于, 更多)
-    const drawerFooter = this._renderDrawerFooter();
-    drawer.appendChild(drawerFooter);
+    // 存储容量条放面板底部（弱化展示，点击仍可看详情）
+    if (this.props.storageBar) {
+      const storageEl = this.props.storageBar.render();
+      this.props.storageBar.el = storageEl;
+      drawer.appendChild(storageEl);
+    }
 
     container.append(backdrop, drawer);
 
     // 保存 DOM 引用
     this._drawerEl = drawer;
     this._backdropEl = backdrop;
+    this._headerEl = header;
+
+    // 已打开状态下重渲染，需要重新对齐面板位置
+    if (this._isDrawerOpen) {
+      this._syncPopoverPosition();
+    }
 
     if (this.state.note) {
       this._titleInput = header.querySelector('.note-title-input');
       this._textarea = editorEl.querySelector('.note-content-textarea');
       this._saveStatus = header.querySelector('.note-save-status');
       this._timeDisplay = header.querySelector('.note-time');
-      this._moreBtn = header.querySelector('.btn-more');
-      this._modeToggleBtn = header.querySelector('.btn-mode-toggle');
-      this._prevBtn = header.querySelector('.btn-nav-prev');
-      this._nextBtn = header.querySelector('.btn-nav-next');
+      this._prevBtn = /** @type {HTMLButtonElement} */ (header.querySelector('.btn-nav-prev'));
+      this._nextBtn = /** @type {HTMLButtonElement} */ (header.querySelector('.btn-nav-next'));
     }
 
     // 监听保存完成
@@ -172,11 +179,26 @@ export class NoteEditor {
   }
 
   /**
-   * 打开滑动抽屉
+   * 同步浮动面板位置（锚定在顶部栏下方）
+   * @private
+   */
+  _syncPopoverPosition() {
+    if (!this._drawerEl || !this._headerEl) return;
+    // 首次渲染时元素尚未挂载，等进入文档后再计算
+    if (!this._headerEl.isConnected) {
+      requestAnimationFrame(() => this._syncPopoverPosition());
+      return;
+    }
+    this._drawerEl.style.top = `${this._headerEl.offsetHeight + 6}px`;
+  }
+
+  /**
+   * 打开浮动笔记面板
    * @private
    */
   _openListDrawer() {
     this._isDrawerOpen = true;
+    this._syncPopoverPosition();
     if (this._drawerEl) {
       this._drawerEl.classList.add('open');
     }
@@ -197,11 +219,6 @@ export class NoteEditor {
     if (this._backdropEl) {
       this._backdropEl.classList.remove('show');
     }
-    // 清除可能存在的抽屉底部更多浮动菜单
-    const menu = this.el?.querySelector('.drawer-popup-menu');
-    if (menu) menu.remove();
-    const moreBtn = this.el?.querySelector('.btn-drawer-more');
-    if (moreBtn) moreBtn.classList.remove('active');
   }
 
   /**
@@ -289,7 +306,6 @@ export class NoteEditor {
 
       const prevBtn = document.createElement('button');
       prevBtn.className = 'btn-nav btn-nav-prev';
-      prevBtn.title = t('prevNote') || '上一篇';
       prevBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="4 10 8 6 12 10"/>
       </svg>`;
@@ -301,7 +317,6 @@ export class NoteEditor {
 
       const nextBtn = document.createElement('button');
       nextBtn.className = 'btn-nav btn-nav-next';
-      nextBtn.title = t('nextNote') || '下一篇';
       nextBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="4 6 8 10 12 6"/>
       </svg>`;
@@ -313,33 +328,25 @@ export class NoteEditor {
 
       rightActions.append(prevBtn, nextBtn);
 
-      // 编辑/预览切换
-      const modeToggleBtn = document.createElement('button');
-      modeToggleBtn.className = 'btn-mode-toggle';
-      modeToggleBtn.title = this._previewMode ? (t('editNote') || '编辑') : (t('previewNote') || '预览');
-      modeToggleBtn.innerHTML = this._previewMode ? this._getEditIcon() : this._getPreviewIcon();
-      modeToggleBtn.onclick = () => this._toggleMode();
-      rightActions.appendChild(modeToggleBtn);
-
-      // 更多菜单
-      const moreBtn = document.createElement('button');
-      moreBtn.className = 'btn-more';
-      moreBtn.title = t('more') || '更多';
-      moreBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
-        <circle cx="8" cy="3" r="1.5"/>
-        <circle cx="8" cy="8" r="1.5"/>
-        <circle cx="8" cy="13" r="1.5"/>
-      </svg>`;
-      moreBtn.onclick = () => {
-        this._getMoreMenu().toggle(moreBtn);
-      };
-      rightActions.appendChild(moreBtn);
-
       this._prevBtn = prevBtn;
       this._nextBtn = nextBtn;
-      this._modeToggleBtn = modeToggleBtn;
-      this._moreBtn = moreBtn;
+      this._updateNavTips();
     }
+
+    // 更多菜单（常驻：笔记操作 + 导入导出/反馈/关于）
+    const moreBtn = document.createElement('button');
+    moreBtn.className = 'btn-more';
+    moreBtn.title = t('more') || '更多';
+    moreBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+      <circle cx="8" cy="3" r="1.5"/>
+      <circle cx="8" cy="8" r="1.5"/>
+      <circle cx="8" cy="13" r="1.5"/>
+    </svg>`;
+    moreBtn.onclick = () => {
+      this._getMoreMenu().toggle(moreBtn);
+    };
+    rightActions.appendChild(moreBtn);
+    this._moreBtn = moreBtn;
 
     header.appendChild(rightActions);
 
@@ -364,171 +371,6 @@ export class NoteEditor {
     }
 
     return header;
-  }
-
-  /**
-   * 渲染滑动抽屉底部的 "更多面板"
-   * @private
-   */
-  _renderDrawerFooter() {
-    const footer = document.createElement('div');
-    footer.className = 'drawer-footer';
-
-    // 1. 标语 (Slogan)
-    const brandInfo = document.createElement('div');
-    brandInfo.className = 'drawer-brand-info';
-
-    const brandName = document.createElement('div');
-    brandName.className = 'drawer-brand-name';
-    brandName.textContent = 'SlideNote';
-
-    const brandSlogan = document.createElement('div');
-    brandSlogan.className = 'drawer-brand-slogan';
-    brandSlogan.textContent = t('appDesc') || '侧边笔记，常伴左右';
-
-    brandInfo.append(brandName, brandSlogan);
-    footer.appendChild(brandInfo);
-
-    // 3. 全局功能面板 (关于, 更多)
-    const actionsContainer = document.createElement('div');
-    actionsContainer.className = 'drawer-more-actions';
-
-    // 关于
-    const aboutBtn = document.createElement('button');
-    aboutBtn.className = 'drawer-action-btn';
-    aboutBtn.title = t('aboutTitle') || '关于';
-    aboutBtn.innerHTML = `<span>ℹ️</span><span>${t('about') || '关于'}</span>`;
-    aboutBtn.onclick = (e) => {
-      e.stopPropagation();
-      this._closeListDrawer();
-      this.props.bus?.emit('about:show');
-    };
-
-    // 更多
-    const moreBtn = document.createElement('button');
-    moreBtn.className = 'drawer-action-btn btn-drawer-more';
-    moreBtn.title = t('more') || '更多';
-    moreBtn.innerHTML = `<span>⚙️</span><span>${t('more') || '更多'}</span>`;
-    moreBtn.onclick = (e) => {
-      e.stopPropagation();
-      this._toggleDrawerMoreMenu(moreBtn, footer);
-    };
-
-    actionsContainer.append(aboutBtn, moreBtn);
-    footer.appendChild(actionsContainer);
-
-    return footer;
-  }
-
-  /**
-   * 切换抽屉底部更多浮动菜单
-   * @private
-   * @param {HTMLElement} buttonEl
-   * @param {HTMLElement} footerEl
-   */
-  _toggleDrawerMoreMenu(buttonEl, footerEl) {
-    // 检查是否已经存在菜单
-    let menu = footerEl.querySelector('.drawer-popup-menu');
-    if (menu) {
-      menu.classList.remove('show');
-      setTimeout(() => menu.remove(), 150);
-      buttonEl.classList.remove('active');
-      return;
-    }
-
-    // 关闭其它打开的菜单
-    const existing = document.querySelectorAll('.drawer-popup-menu');
-    existing.forEach(m => m.remove());
-    const activeBtns = document.querySelectorAll('.drawer-action-btn.active');
-    activeBtns.forEach(b => b.classList.remove('active'));
-
-    buttonEl.classList.add('active');
-
-    // 创建新菜单
-    menu = document.createElement('div');
-    menu.className = 'drawer-popup-menu';
-
-    // 菜单项定义
-    const items = [
-      {
-        icon: '📥',
-        label: t('importBackup') || '导入备份',
-        action: () => {
-          this._closeListDrawer();
-          this.props.bus?.emit('import:show-dialog');
-        }
-      },
-      {
-        icon: '📤',
-        label: t('exportNotes') || '导出笔记',
-        action: () => {
-          this._closeListDrawer();
-          this.props.bus?.emit('export:show-dialog');
-        }
-      },
-      {
-        icon: '💬',
-        label: t('feedback') || '意见反馈',
-        action: () => {
-          chrome.tabs.create({ url: 'https://my.feishu.cn/share/base/form/shrcnnfhgGcaqzU3lUfrDxamVZc' });
-        }
-      }
-    ];
-
-    items.forEach(item => {
-      const itemEl = document.createElement('div');
-      itemEl.className = 'drawer-popup-menu-item';
-      itemEl.innerHTML = `<span class="menu-icon">${item.icon}</span><span class="menu-label">${item.label}</span>`;
-      itemEl.onclick = (e) => {
-        e.stopPropagation();
-        item.action();
-        menu.classList.remove('show');
-        setTimeout(() => menu.remove(), 150);
-        buttonEl.classList.remove('active');
-      };
-      menu.appendChild(itemEl);
-    });
-
-    footerEl.appendChild(menu);
-
-    // 触发动画显示
-    requestAnimationFrame(() => {
-      menu.classList.add('show');
-    });
-
-    // 点击外部关闭
-    const closeHandler = (e) => {
-      if (!menu.contains(e.target) && e.target !== buttonEl) {
-        menu.classList.remove('show');
-        setTimeout(() => menu.remove(), 150);
-        buttonEl.classList.remove('active');
-        document.removeEventListener('click', closeHandler);
-      }
-    };
-
-    setTimeout(() => {
-      document.addEventListener('click', closeHandler);
-    }, 50);
-  }
-
-  /**
-   * 获取编辑图标
-   * @private
-   */
-  _getEditIcon() {
-    return `<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M12.146.146a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-10 10a.5.5 0 01-.168.11l-5 2a.5.5 0 01-.65-.65l2-5a.5.5 0 01.11-.168l10-10zM11.207 2.5L13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 01.5.5v.5h.5a.5.5 0 01.5.5v.5h.293l6.5-6.5zm-9.761 5.175l-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 015 12.5V12h-.5a.5.5 0 01-.5-.5V11h-.5a.5.5 0 01-.468-.325z"/>
-    </svg>`;
-  }
-
-  /**
-   * 获取预览图标
-   * @private
-   */
-  _getPreviewIcon() {
-    return `<svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M1 8s2-4 7-4 7 4 7 4-2 4-7 4-7-4-7-4zm7 3a3 3 0 110-6 3 3 0 010 6zm0-1a2 2 0 100-4 2 2 0 000 4z"/>
-    </svg>`;
   }
 
   /**
@@ -575,10 +417,6 @@ export class NoteEditor {
         e.preventDefault();
         /** @type {HTMLInputElement} */ (this._titleInput)?.focus();
       }
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        this._setPreviewMode();
-      }
     };
 
     editor.append(textarea, previewLayer);
@@ -611,17 +449,21 @@ export class NoteEditor {
    * 切换到编辑模式
    * @private
    */
-  _setEditMode() {
-    if (!this._textarea || !this._previewLayer || !this._modeToggleBtn) return;
+  /**
+   * 切换到编辑模式
+   * @private
+   * @param {boolean} [focus=true] 是否聚焦编辑区
+   */
+  _setEditMode(focus = true) {
+    if (!this._textarea || !this._previewLayer) return;
     this._previewMode = false;
 
     this._textarea.style.display = 'block';
     this._previewLayer.style.display = 'none';
 
-    this._modeToggleBtn.innerHTML = this._getPreviewIcon();
-    this._modeToggleBtn.setAttribute('aria-label', t('previewNote') || '预览');
-
-    this._textarea.focus();
+    if (focus) {
+      this._textarea.focus();
+    }
     saveGlobalMode('edit');
   }
 
@@ -630,7 +472,7 @@ export class NoteEditor {
    * @private
    */
   _setPreviewMode() {
-    if (!this._textarea || !this._previewLayer || !this._modeToggleBtn) return;
+    if (!this._textarea || !this._previewLayer) return;
     this._previewMode = true;
 
     const content = this._textarea.textContent || '';
@@ -638,9 +480,6 @@ export class NoteEditor {
 
     this._textarea.style.display = 'none';
     this._previewLayer.style.display = 'block';
-
-    this._modeToggleBtn.innerHTML = this._getEditIcon();
-    this._modeToggleBtn.setAttribute('aria-label', t('editNote') || '编辑');
 
     saveGlobalMode('preview');
   }
@@ -665,10 +504,10 @@ export class NoteEditor {
 
     if (currentIndex > 0) {
       const prevNote = notes[currentIndex - 1];
+      // 与列表点击路径对齐：先持久化选中，再通知界面切换
+      this.props.store?.setActiveNote(prevNote.id);
       this.props.bus?.emit('note:select', prevNote.id);
     }
-
-    this._updateNavButtons();
   }
 
   /**
@@ -681,10 +520,50 @@ export class NoteEditor {
 
     if (currentIndex >= 0 && currentIndex < notes.length - 1) {
       const nextNote = notes[currentIndex + 1];
+      // 与列表点击路径对齐：先持久化选中，再通知界面切换
+      this.props.store?.setActiveNote(nextNote.id);
       this.props.bus?.emit('note:select', nextNote.id);
     }
+  }
 
-    this._updateNavButtons();
+  /**
+   * 获取相邻笔记（上一篇 / 下一篇）
+   * @private
+   * @returns {{prev: Object|null, next: Object|null}}
+   */
+  _getAdjacentNotes() {
+    const notes = this.props.store?.getSortedNotes() || [];
+    const currentIndex = notes.findIndex(n => n.id === this.state.note?.id);
+    return {
+      prev: currentIndex > 0 ? notes[currentIndex - 1] : null,
+      next: (currentIndex >= 0 && currentIndex < notes.length - 1) ? notes[currentIndex + 1] : null,
+    };
+  }
+
+  /**
+   * 更新导航按钮的悬浮提示（显示相邻笔记标题）
+   * @private
+   */
+  _updateNavTips() {
+    if (!this._prevBtn || !this._nextBtn) return;
+
+    const { prev, next } = this._getAdjacentNotes();
+    this._setNavTip(this._prevBtn, t('prevNote') || '上一篇', prev, t('firstNoteReached') || '已经是第一篇了');
+    this._setNavTip(this._nextBtn, t('nextNote') || '下一篇', next, t('lastNoteReached') || '已经是最后一篇了');
+  }
+
+  /**
+   * 设置单个导航按钮的提示文案
+   * @private
+   * @param {HTMLButtonElement} btn
+   * @param {string} label 方向前缀（上一篇 / 下一篇）
+   * @param {Object|null} note 相邻笔记，null 表示已到边界
+   * @param {string} emptyText 到达边界时的提示
+   */
+  _setNavTip(btn, label, note, emptyText) {
+    const title = note ? (note.title?.trim() || t('unnamedNote') || '未命名笔记') : null;
+    btn.dataset.tip = title ? `${label} · ${title}` : emptyText;
+    btn.setAttribute('aria-label', title ? `${label}：${title}` : emptyText);
   }
 
   /**
@@ -714,6 +593,8 @@ export class NoteEditor {
       this._nextBtn.disabled = false;
       this._nextBtn.classList.remove('disabled');
     }
+
+    this._updateNavTips();
   }
 
   /**
@@ -726,8 +607,12 @@ export class NoteEditor {
         store: this.props.store,
         bus: this.props.bus,
         previewLayer: this._previewLayer,
+        // 动态读取当前模式，用于刷新菜单里 "预览/编辑" 项的文案
+        isPreviewMode: () => this._previewMode,
       });
     }
+    // 重渲染后 previewLayer 引用会更新，每次打开菜单前刷新
+    this._moreMenu.props.previewLayer = this._previewLayer;
     return this._moreMenu;
   }
 
@@ -810,7 +695,6 @@ export class NoteEditor {
       this._titleInput = this.el.querySelector('.note-title-input');
       this._textarea = this.el.querySelector('.note-content-textarea');
       this._previewLayer = this.el.querySelector('.markdown-preview-layer');
-      this._modeToggleBtn = this.el.querySelector('.btn-mode-toggle');
 
       if (this._isNewNote) {
         this._focusTitleInput();
@@ -833,23 +717,16 @@ export class NoteEditor {
 
     // 监听编辑模式设置请求（用于新建笔记后自动进入编辑模式）
     const unsubscribeSetEditMode = this.props.bus?.on('editor:set-edit-mode', () => {
-      const textarea = this.el?.querySelector('.note-content-textarea');
-      const previewLayer = this.el?.querySelector('.markdown-preview-layer');
-      const modeToggleBtn = this.el?.querySelector('.btn-mode-toggle');
-
-      if (textarea) {
-        textarea.style.display = 'block';
-      }
-      if (previewLayer) {
-        previewLayer.style.display = 'none';
-      }
-      if (modeToggleBtn) {
-        modeToggleBtn.innerHTML = this._getPreviewIcon();
-        modeToggleBtn.setAttribute('aria-label', t('previewNote') || '预览');
-      }
-      this._previewMode = false;
+      // 不抢焦点，保持标题输入框的聚焦（新建笔记场景）
+      this._setEditMode(false);
     });
     if (unsubscribeSetEditMode) this._cleanup.push(unsubscribeSetEditMode);
+
+    // 监听预览/编辑模式切换请求（来自更多菜单）
+    const unsubscribeToggleMode = this.props.bus?.on('editor:toggle-mode', () => {
+      this._toggleMode();
+    });
+    if (unsubscribeToggleMode) this._cleanup.push(unsubscribeToggleMode);
   }
 
   /**
@@ -938,6 +815,7 @@ export class NoteEditor {
     await this._savePendingChanges();
     clearTimeout(this._saveTimer);
     document.removeEventListener('keydown', this._escHandler);
+    window.removeEventListener('resize', this._resizeHandler);
     this._cleanup.forEach(fn => fn());
     this._moreMenu?.destroy();
     this._syntaxHelpModal?.destroy();

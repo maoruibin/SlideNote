@@ -223,6 +223,58 @@
     "message": "Toggle Note List",
     "description": "Toggle note list popover button"
   },
+  "prevNote": {
+    "message": "Previous note",
+    "description": "Previous note nav button"
+  },
+  "nextNote": {
+    "message": "Next note",
+    "description": "Next note nav button"
+  },
+  "firstNoteReached": {
+    "message": "Already the first note",
+    "description": "Hint when already at the first note"
+  },
+  "lastNoteReached": {
+    "message": "Already the last note",
+    "description": "Hint when already at the last note"
+  },
+  "more": {
+    "message": "More",
+    "description": "More menu button"
+  },
+  "previewNote": {
+    "message": "Preview",
+    "description": "Switch to preview mode"
+  },
+  "editNote": {
+    "message": "Edit",
+    "description": "Switch to edit mode"
+  },
+  "importBackup": {
+    "message": "Import Backup",
+    "description": "Import backup menu item"
+  },
+  "exportNotes": {
+    "message": "Export Notes",
+    "description": "Export notes menu item"
+  },
+  "feedback": {
+    "message": "Feedback",
+    "description": "Feedback menu item"
+  },
+  "syntaxHelp": {
+    "message": "Syntax Help",
+    "description": "Markdown syntax help menu item"
+  },
+  "copyAsRichText": {
+    "message": "Copy as Rich Text",
+    "description": "Copy as rich text menu item"
+  },
+  "copyAsMarkdown": {
+    "message": "Copy as Markdown",
+    "description": "Copy as markdown menu item"
+  },
   "selectNote": {
     "message": "Select Note",
     "description": "Select note button on welcome screen"

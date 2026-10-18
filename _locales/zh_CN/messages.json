@@ -357,6 +357,22 @@
     "message": "切换笔记列表 (展开/收起)",
     "description": "切换笔记列表显示状态按钮"
   },
+  "prevNote": {
+    "message": "上一篇",
+    "description": "上一篇导航按钮"
+  },
+  "nextNote": {
+    "message": "下一篇",
+    "description": "下一篇导航按钮"
+  },
+  "firstNoteReached": {
+    "message": "已经是第一篇了",
+    "description": "已到达第一篇笔记的提示"
+  },
+  "lastNoteReached": {
+    "message": "已经是最后一篇了",
+    "description": "已到达最后一篇笔记的提示"
+  },
   "selectNote": {
     "message": "选择笔记",
     "description": "空白欢迎状态下的选择笔记按钮"

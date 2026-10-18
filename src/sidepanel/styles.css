@@ -820,11 +820,10 @@ button {
   flex: 1;
 }
 
-/* 更多按钮 / 模式切换按钮 / 导航按钮 */
+/* 更多按钮 / 导航按钮 */
 .btn-more,
 .btn-preview,
 .btn-edit,
-.btn-mode-toggle,
 .btn-nav {
   width: 32px;
   height: 32px;
@@ -861,14 +860,49 @@ button {
   stroke-width: 2;
 }
 
+/* 导航按钮悬浮提示：显示上一篇 / 下一篇标题 */
+.btn-nav {
+  position: relative;
+}
+
+.btn-nav::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 9px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.82);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  z-index: 200;
+}
+
+.btn-nav:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 200ms;
+}
+
 .btn-more:hover,
 .btn-more.active,
 .btn-preview:hover,
 .btn-preview.active,
 .btn-edit:hover,
-.btn-edit.active,
-.btn-mode-toggle:hover,
-.btn-mode-toggle.active {
+.btn-edit.active {
   background: var(--color-bg-hover);
   color: var(--color-text-secondary);
 }
@@ -2204,20 +2238,18 @@ button {
 }
 
 /* ============================================
-   单面板极简抽屉式设计 (List Drawer & Premium Styles)
+   浮动笔记面板 (List Popover)
    ============================================ */
 
-/* 抽屉半透明背景遮罩 (含高阶毛玻璃质感) */
+/* 面板背景遮罩（轻量，仅用于点击外部关闭） */
 .drawer-backdrop {
   position: absolute;
   inset: 0;
   z-index: 99;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.1);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .drawer-backdrop.show {
@@ -2225,35 +2257,78 @@ button {
   pointer-events: auto;
 }
 
-/* 左侧滑动列表抽屉 */
-.list-drawer {
+/* 浮动笔记面板：窄卡片，锚定在顶部栏左下方，悬浮于内容之上 */
+.list-popover {
   position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 240px;
+  left: 8px;
+  width: min(260px, calc(100% - 16px));
+  top: 52px; /* 实际位置由 JS 按顶部栏高度同步 */
   z-index: 100;
-  background: var(--color-bg-secondary);
-  border-right: 1px solid var(--color-border);
+  max-height: min(420px, calc(100% - 64px));
   display: flex;
   flex-direction: column;
-  height: 100%;
-  transform: translateX(-100%);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: top left;
+  transition:
+    opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.2s;
 }
 
-.list-drawer.open {
-  transform: translateX(0);
-  box-shadow: 6px 0 24px rgba(0, 0, 0, 0.08);
+.list-popover.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
 }
 
-/* 抽屉内列表尺寸优化，填满抽屉 */
-.list-drawer .note-list {
-  height: 100%;
-  max-height: none;
+/* 面板内笔记列表：撑满剩余空间并滚动 */
+.list-popover .note-list {
   flex: 1;
+  min-height: 0;
+  max-height: none;
   overflow-y: auto;
   padding: var(--spacing-sm);
+}
+
+/* 面板底部 StorageBar：弱化展示，仅作低调的容量提示 */
+.list-popover > .storage-bar {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent !important;
+  padding: 5px 12px 6px;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.list-popover > .storage-bar .storage-progress {
+  height: 3px;
+  background: var(--color-border);
+  border-radius: 2px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.list-popover > .storage-bar .storage-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+.list-popover > .storage-bar .storage-info {
+  font-size: 10.5px;
+  color: var(--color-text-tertiary);
+  padding: 0;
+  opacity: 0.85;
+}
+
+.list-popover > .storage-bar .storage-icon {
+  font-size: 10px;
 }
 
 /* 统一极简头部 (CSS Grid 架构) */
@@ -2647,169 +2722,6 @@ button {
   color: var(--color-text-primary);
 }
 
-/* ============================================
-   左侧滑动列表抽屉页脚 (Drawer Footer)
-   ============================================ */
-.drawer-footer {
-  padding: 16px 14px;
-  background: var(--color-bg-secondary);
-  border-top: 1px solid var(--color-border);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* 标语 (Slogan) */
-.drawer-brand-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  align-items: center;
-  text-align: center;
-  margin: 2px 0;
-}
-
-.drawer-brand-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.2;
-  letter-spacing: 0.3px;
-}
-
-.drawer-brand-slogan {
-  font-size: 10.5px;
-  color: var(--color-text-tertiary);
-  line-height: 1.2;
-}
-
-/* 全局操作网格 (导入、导出、反馈、关于) */
-.drawer-more-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-.drawer-action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 32px;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.drawer-action-btn:hover {
-  background: var(--color-bg-hover);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  transform: translateY(-0.5px);
-  box-shadow: var(--shadow-sm);
-}
-
-.drawer-action-btn:active {
-  background: var(--color-bg-active);
-  transform: translateY(0);
-}
-
-.drawer-action-btn span:first-child {
-  font-size: 13px;
-}
-
-/* Drawer Top 内 StorageBar 样式极简覆盖 */
-.list-drawer > .storage-bar {
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-secondary) !important;
-  padding: 12px 14px 10px;
-  box-shadow: none;
-}
-
-.list-drawer > .storage-bar .storage-progress {
-  height: 4px;
-  background: var(--color-border);
-  border-radius: 2px;
-  margin-top: 5px;
-}
-
-.list-drawer > .storage-bar .storage-progress-fill {
-  height: 100%;
-  border-radius: 2px;
-}
-
-.list-drawer > .storage-bar .storage-info {
-  font-size: 11px;
-  color: var(--color-text-secondary);
-  padding: 0;
-}
-
-/* 抽屉底部更多浮动菜单 (Drawer Popup Menu) */
-.drawer-footer {
-  position: relative; /* 确保弹出菜单以页脚容器为基准进行绝对定位 */
-}
-
-.drawer-popup-menu {
-  position: absolute;
-  bottom: 60px; /* 浮动在按钮网格上方，避免被遮挡 */
-  right: 14px;
-  width: 140px;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  padding: 4px 0;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px) scale(0.95);
-  transition: all var(--duration-fast) var(--ease-out);
-  z-index: 110; /* 高于常规列表项，确保不被阻挡 */
-}
-
-.drawer-popup-menu.show {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-}
-
-.drawer-popup-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: all var(--duration-fast);
-}
-
-.drawer-popup-menu-item:hover {
-  background: var(--color-bg-secondary);
-  color: var(--color-primary);
-}
-
-.drawer-popup-menu-item .menu-icon {
-  font-size: 14px;
-}
-
-.drawer-popup-menu-item .menu-label {
-  flex: 1;
-}
-
-/* 更多按钮处于激活态时的增强样式 */
-.btn-drawer-more.active {
-  background: var(--color-bg-hover);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
 
 
 
